@@ -1,0 +1,24 @@
+<h1>Voluntarios Disponibles</h1>
+
+<div class="volunteers-list">
+  {{
+#each
+ volunteers}}
+    <div class="volunteer-card">
+      <h2>{{full_name}}</h2>
+      <p>Contacto: {{contact_info}}</p>
+      <p>Disponibilidad: {{availability}}</p>
+      <a href="/reservations/new/{{id}}" class="button">Reservar</a>
+      <a href="/reviews/volunteer/{{id}}" class="button">Ver Reseñas</a>
+    </div>
+  {{
+/each
+}}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Aquí puedes agregar funcionalidad de JavaScript para mejorar la accesibilidad
+    // Por ejemplo, leer en voz alta la información del voluntario al hacer focus en la tarjeta
+  });
+</script>
