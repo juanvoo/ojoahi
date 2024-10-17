@@ -1,0 +1,35 @@
+<h2>Voluntarios Disponibles</h2>
+{{
+#if
+ volunteers.length}}
+  <div class="volunteer-grid">
+    {{
+#each
+ volunteers}}
+      <div class="volunteer-card">
+        <h3>{{this.name}}</h3>
+        <p>Especialidad: {{this.specialty}}</p>
+        <p>Calificación: {{this.averageRating}}/5</p>
+        <p>Estado: {{
+#if
+ this.isAvailable}}Disponible{{else}}No disponible{{
+/if
+}}</p>
+        <a href="/volunteers/{{this.id}}" class="btn btn-info">Ver Perfil</a>
+        {{
+#if
+ this.isAvailable}}
+          <a href="/reservations/new?volunteerId={{this.id}}" class="btn btn-primary">Reservar</a>
+        {{
+/if
+}}
+      </div>
+    {{
+/each
+}}
+  </div>
+{{else}}
+  <p>No hay voluntarios disponibles en este momento.</p>
+{{
+/if
+}}

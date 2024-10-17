@@ -1,0 +1,25 @@
+<h2>Reseñas para {{volunteerName}}</h2>
+<div class="volunteer-info">
+  <p>Calificación promedio: {{averageRating}} / 5</p>
+  <p>Total de reseñas: {{totalReviews}}</p>
+</div>
+{{
+#if
+ reviews.length}}
+  {{
+#each
+ reviews}}
+    <div class="review">
+      <h3>{{this.userNUsername}} - Calificación: {{this.rating}}/5</h3>
+      <p>{{this.comment}}</p>
+      <small>Fecha: {{formatDate this.createdAt}}</small>
+    </div>
+  {{
+/each
+}}
+{{else}}
+  <p>Este voluntario aún no tiene reseñas.</p>
+{{
+/if
+}}
+<a href="/volunteers/{{volunteerId}}" class="btn btn-secondary">Volver al Perfil del Voluntario</a>

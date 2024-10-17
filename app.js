@@ -32,6 +32,22 @@ app.get('/', (req, res) => {
   res.render('home');
 });
 
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
+app.get('/register', (req, res) => {
+  res.render('register');
+});
+
+app.get('/volunteers', (req, res) => {
+  res.render('volunteers');
+});
+
+app.get('/reservations', (req, res) => {
+  res.render('reservartions');
+});
+
 // Iniciar el servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

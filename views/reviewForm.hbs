@@ -1,0 +1,19 @@
+<h2>Dejar una Reseña para {{volunteerName}}</h2>
+<form action="/reviews/create" method="POST">
+  <input type="hidden" name="volunteerId" value="{{volunteerId}}">
+  <div class="form-group">
+    <label for="rating">Calificación:</label>
+    <select id="rating" name="rating" required>
+      <option value="5">5 - Excelente</option>
+      <option value="4">4 - Muy Bueno</option>
+      <option value="3">3 - Bueno</option>
+      <option value="2">2 - Regular</option>
+      <option value="1">1 - Malo</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="comment">Comentario:</label>
+    <textarea id="comment" name="comment" rows="4" required></textarea>
+  </div>
+  <button type="submit" class="btn btn-primary">Enviar Reseña</button>
+</form>
