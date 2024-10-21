@@ -1,4 +1,4 @@
-<h2>Reseñas para {{volunteerName}}</h2>
+{{!-- <h2>Reseñas para {{volunteerName}}</h2>
 <div class="volunteer-info">
   <p>Calificación promedio: {{averageRating}} / 5</p>
   <p>Total de reseñas: {{totalReviews}}</p>
@@ -22,4 +22,26 @@
 {{
 /if
 }}
-<a href="/volunteers/{{volunteerId}}" class="btn btn-secondary">Volver al Perfil del Voluntario</a>
+<a href="/volunteers/{{volunteerId}}" class="btn btn-secondary">Volver al Perfil del Voluntario</a> --}}
+
+<h2>Reseñas de {{volunteer.name}}</h2>
+{{#if reviews.length}}
+    <div class="average-rating">
+        Calificación promedio: {{averageRating}} / 5
+    </div>
+    {{#each reviews}}
+        <div class="review">
+            <div class="rating">
+                Calificación: {{this.rating}} / 5
+            </div>
+            <div class="comment">
+                {{this.comment}}
+            </div>
+            <div class="review-meta">
+                Por: {{this.user.username}} - {{formatDate this.createdAt}}
+            </div>
+        </div>
+    {{/each}}
+{{else}}
+    <p>Este voluntario aún no tiene reseñas.</p>
+{{/if}}

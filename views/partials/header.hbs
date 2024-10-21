@@ -1,0 +1,16 @@
+<link rel="stylesheet" href="/public/css/styles.css">
+<nav class="navbar">
+    <div class="logo"><img src="/images/Ojo.png" alt=""> <a href="/">OjoAhi</a></div>
+        <ul class="nav-links">
+            <li><a href="/">{{__ 'Home'}}</a></li>
+            {{#if user}}
+                <li><a href="/reservations">{{__ 'Reservations'}}</a></li>
+                <li><a href="/logout">{{__ 'Logout'}}</a></li>
+            {{else}}
+                <li><a href="/login" class="cta">{{__ 'Login'}}</a></li>
+                <li><a href="/register" class="cta">{{__ 'Register'}}</a></li>
+            {{/if}}
+        </ul>
+    </nav>
+
+    

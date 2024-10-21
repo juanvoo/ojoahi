@@ -1,116 +1,22 @@
-{{!-- <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OjoAhi</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="icon" href="/images/OjoAhiLogo.png" type="image/x-icon">
-</head>
-<body>
-    <header>
-        <div class="container">
-            <div id="branding">
-                <h1><a href="/"> <img class="logo" src="/images/OjoAhiLogo.png" alt="">OjoAhi</a></h1>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="/">Inicio</a></li>
-                    <li><a href="/login">Iniciar Sesión</a></li>
-                    <li><a href="/register">Registrarse</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <div class="container">
-        {{{body}}}
-    </div>
-
-    <footer>
-        <p class="copyright">&copy; 2024 ELTEAM. All rights reserved.</p>
-    </footer>
-
-    <script src="/js/main.js"></script>
-</body>
-</html> --}}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{__ 'lang'}}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OjoAhi</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="icon" href="/images/OjoAhiLogo.png" type="image/x-icon">
+    {{!-- <title>OjoAhi</title> --}}
 </head>
 <body>
-    <header>
-        <div class="container">
-            <nav>
-                <div class="logo"><img src="/images/OjoAhiLogo.png" alt=""> OjoAhi</div>
-                <div class="menu-toggle" id="mobile-menu">
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                </div>
-                <ul class="nav-links">
-                    <li><a href="/">Inicio</a></li>
-                    <li><a href="/login">Iniciar Sesión</a></li>
-                    <li><a href="/register">Registrarse</a></li>
-                    <li><a href="/">Inicio</a></li>
-                    <li><a href="/volunteers">Voluntarios</a></li>
-                    <li><a href="/reservations">Mis Reservas</a></li>
-                    {{#if user}}
-                        <li><a href="/profile">Mi Perfil</a></li>
-                        <li><a href="/logout">Cerrar Sesión</a></li>
-                    {{else}}
-                        <li><a href="/login">Iniciar Sesión</a></li>
-                        <li><a href="/register">Registrarse</a></li>
-                    {{/if}}
-                </ul>
-            </nav>
-            <div class="hero">
-                <h1>BIENVENIDOS A OJOAHI</h1>
-                <p>from a creative studio that loves to design nice things for the web & print.</p>
-                <a href="#" class="btn">Start Your Project</a>
-            </div>
-        </div>
-    </header>
+    {{>header}}
+    {{{body}}}
+    {{>footer}}
     
-    <div class="container">
-        {{{body}}}
-    </div>
-
-    <section class="services">
-        <div class="container">
-            <h2>Our Services</h2>
-            <div class="service-cards">
-                <div class="card">
-                    <h3>Logo & Graphic Design</h3>
-                    <p>We all want to make a good first impression, and hopefully a lasting one...</p>
-                </div>
-                <div class="card">
-                    <h3>Web Design & Development</h3>
-                    <p>Let’s work together to grow your business online...</p>
-                </div>
-                <div class="card">
-                    <h3>Search Engine Optimisation</h3>
-                    <p>We believe that a focus on natural SEO is key for long-term success...</p>
-                </div>
-                <div class="card">
-                    <h3>Online Marketing</h3>
-                    <p>With the most stunning website you still need visitors to make it...</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 ELTEAM. All rights reserved.</p>
-        </div>
-    </footer>
-
     <script src="/js/main.js"></script>
+    <script src="/js/accessibility.js"></script>
 </body>
 </html>
+
+
+
+

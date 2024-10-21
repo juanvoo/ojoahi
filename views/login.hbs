@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+{{!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="/css/forms.css">
+    <link rel="icon" href="/images/OjoAhiLogo.png" type="image/x-icon">
 </head>
 <body>
     <div class="form-container">
@@ -23,4 +24,27 @@
         </form>
     </div>
 </body>
-</html>
+</html> --}}
+
+
+<link rel="stylesheet" href="/css/forms.css">
+<title>Login</title>
+<h2>{{__ 'Login'}}</h2>
+
+{{#if error_msg}}
+  <div class="alert alert-danger">{{error_msg}}</div>
+{{/if}}
+
+<form action="/login" method="POST">
+  <div>
+    <label for="email">{{__ 'Email'}}:</label>
+    <input type="email" id="email" name="email" required>
+  </div>
+  <div>
+    <label for="password">{{__ 'Password'}}:</label>
+    <input type="password" id="password" name="password" required>
+  </div>
+  <button type="submit">{{__ 'Login'}}</button>
+</form>
+
+<p>{{__ 'NoAccount'}} <a href="/register">{{__ 'Register'}}</a></p>

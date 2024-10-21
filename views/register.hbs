@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -31,4 +31,37 @@
         </form>
     </div>
 </body>
-</html>
+</html> --}}
+
+
+<link rel="stylesheet" href="/css/forms.css">
+<title>Registrarse</title>
+<h2>{{__ 'Register'}}</h2>
+
+{{#if errors}}
+  {{#each errors}}
+    <div class="alert alert-danger">{{msg}}</div>
+  {{/each}}
+{{/if}}
+
+<form action="/register" method="POST">
+  <div>
+    <label for="username">{{__ 'Username'}}:</label>
+    <input type="text" id="username" name="username" value="{{username}}" required>
+  </div>
+  <div>
+    <label for="email">{{__ 'Email'}}:</label>
+    <input type="email" id="email" name="email" value="{{email}}" required>
+  </div>
+  <div>
+    <label for="password">{{__ 'Password'}}:</label>
+    <input type="password" id="password" name="password" required>
+  </div>
+  <div>
+    <label for="password2">{{__ 'ConfirmPassword'}}:</label>
+    <input type="password" id="password2" name="password2" required>
+  </div>
+  <button type="submit">{{__ 'Register'}}</button>
+</form>
+
+<p>{{__ 'AlreadyHaveAccount'}} <a href="/login">{{__ 'Login'}}</a></p>

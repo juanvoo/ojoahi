@@ -1,0 +1,21 @@
+<h2>{{__ 'Conversation'}} {{otherUser.username}}</h2>
+
+<div id="messages" class="messages-container">
+  {{#each messages}}
+    <div class="message {{#if (eq sender_id ../user.id)}}sent{{else}}received{{/if}}">
+      <p>{{content}}</p>
+      <small>{{formatDate created_at}}</small>
+    </div>
+  {{/each}}
+</div>
+
+<form action="/messages/send" method="POST" class="message-form">
+  <input type="hidden" name="receiverId" value="{{otherUser.id}}">
+  <textarea name="content" required placeholder="{{__ 'TypeYourMessage'}}"></textarea>
+  <button type="submit">{{__ 'SendMessage'}}</button>
+</form>
+
+<script>
+  const messagesContainer = document.getElementById('messages');
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+</script>

@@ -1,0 +1,18 @@
+{
+	"Welcome": "Welcome",
+	"WelcomeMessage": "WelcomeMessage",
+	"PleaseLoginOrRegister": "PleaseLoginOrRegister",
+	"lang": "lang",
+	"Bienvenido a OjoAhi": "Bienvenido a OjoAhi",
+	"Home": "Home",
+	"Login": "Login",
+	"Register": "Register",
+	"Email": "Email",
+	"Password": "Password",
+	"NoAccount": "NoAccount",
+	"Iniciar Sesión": "Iniciar Sesión",
+	"Username": "Username",
+	"ConfirmPassword": "ConfirmPassword",
+	"AlreadyHaveAccount": "AlreadyHaveAccount",
+	"Registro": "Registro"
+}

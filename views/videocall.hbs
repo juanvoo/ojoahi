@@ -1,0 +1,15 @@
+<h2>{{__ 'VideoCall'}}</h2>
+<div id="video-grid"></div>
+
+<div class="video-controls">
+  <button id="toggle-audio">{{__ 'ToggleAudio'}}</button>
+  <button id="toggle-video">{{__ 'ToggleVideo'}}</button>
+  <button id="end-call">{{__ 'EndCall'}}</button>
+</div>
+
+<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const ROOM_ID = '{{roomId}}';
+</script>
+<script src="/js/videocall.js"></script>

@@ -1,93 +1,212 @@
-/* General Styles */
-body {
-  font-family: Arial, sans-serif;
+/* Reset Styles */
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background-color: #2B341F;
-  color: #94DA2D;
 }
 
-.container {
-  width: 90%;
-  margin: 0 auto;
+/* Body and Container Styles */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #0d0d0dff; /* Fondo oscuro */
+  color: #fff;
 }
 
-/* Navigation */
-nav {
+/* Navbar Styles */
+.navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #94DA2D;
-  /* padding: 20px 0; */
-}
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #2B341F;
+  padding: 20px;
+  background-color: transparent;
+  background-color: #00f8b6ff;
 }
 
 .logo img{
-  width: 1.8rem;
+  width: 50px;
+}
+
+.logo a {
+  text-decoration: none;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #fff;
 }
 
 .nav-links {
-  list-style: none;
   display: flex;
-  gap: 20px;
+  list-style: none;
 }
 
-.nav-links li a {
+.nav-links li {
+  margin: 0 15px;
+}
+
+.nav-links a {
   text-decoration: none;
-  color: #333;
+  color: white;
+  font-size: 1rem;
+  transition: color 0.3s;
 }
 
-/* Menu Toggle (hamburguesa) */
-.menu-toggle {
+.nav-links .cta {
+  background-color: #276EF1; /* Botón azul */
+  padding: 10px 20px;
+  border-radius: 20px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.hamburger-menu {
   display: none;
   flex-direction: column;
   cursor: pointer;
 }
 
-.bar {
-  height: 3px;
+.hamburger-menu span {
+  height: 2px;
   width: 25px;
-  background-color: #333;
+  background-color: white;
   margin: 4px 0;
-  transition: all 0.3s;
 }
 
 /* Hero Section */
 .hero {
-  text-align: center;
-  padding: 100px 0;
-  background: url('/images/home.jpg') no-repeat center center/cover;
-  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 80px 20px;
+  background-color: #0d0d0dff;
+  position: relative;
+}
+
+.hero-content {
+  max-width: 600px;
+  z-index: 2;
 }
 
 .hero h1 {
-  font-size: 3rem;
+  font-size: 2.5rem;
   margin-bottom: 20px;
+  color: #ffffff;
 }
 
 .hero p {
   font-size: 1.2rem;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  color: #B0B3C0; /* Texto gris */
 }
 
-.btn {
-  background-color: #333;
-  color: #fff;
-  padding: 10px 20px;
+.cta-large {
+  background-color: #276EF1;
+  color: white;
+  padding: 15px 30px;
+  border-radius: 30px;
   text-decoration: none;
-  border-radius: 5px;
+  font-size: 1.1rem;
+  transition: background-color 0.3s;
 }
 
-/* Services Section */
+.cta-large:hover {
+  background-color: #1D4EB2;
+}
+
+/* Image Section */
+.hero-image {
+  position: relative;
+  max-width: 300px;
+}
+
+.hero-image img {
+  max-width: 100%;
+  border-radius: 10px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .nav-links {
+      display: none;
+  }
+
+  .hamburger-menu {
+      display: flex;
+  }
+
+  .hero {
+      flex-direction: column;
+      text-align: center;
+  }
+
+  .hero-content {
+      width: 100%;
+      padding: 15px;
+  }
+
+  .hero h1 {
+      font-size: 2rem;
+  }
+
+  .hero p {
+      font-size: 1rem;
+  }
+
+  .cta-large {
+      padding: 10px 20px;
+      font-size: 1rem;
+  }
+
+  .hero-image {
+      margin-top: 20px;
+  }
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1); /* Círculos semi-transparentes */
+  z-index: 1; /* Debajo de la imagen */
+}
+
+.circle1 {
+  width: 150px;
+  height: 150px;
+  top: -30px;
+  left: -50px;
+}
+
+.circle2 {
+  width: 250px;
+  height: 250px;
+  bottom: -50px;
+  right: -100px;
+}
+
+.circle3 {
+  width: 100px;
+  height: 100px;
+  bottom: 20px;
+  left: 100px;
+}
+
+/* Ajuste para que la imagen esté por encima de los círculos */
+.hero-image {
+  position: relative;
+  max-width: 300px;
+  z-index: 2; /* Por encima de los círculos */
+  margin-right: 200px;
+}
+
+.hero-image img {
+  max-width: 100%;
+  border-radius: 10px;
+  position: relative;
+  z-index: 3; /* Por encima de todo */
+}
+
 .services {
   padding: 50px 0;
-  background-color: #2B341F;
+  background-color: #0C1635;
   text-align: center;
 }
 
@@ -96,6 +215,7 @@ nav {
   gap: 20px;
   justify-content: space-between;
   flex-wrap: wrap;
+  margin-top: 20px;
 }
 
 .card {
@@ -109,45 +229,6 @@ nav {
 .card h3 {
   margin-bottom: 10px;
   font-size: 1.5rem;
-}
-
-/* Footer */
-footer {
-  padding: 20px 0;
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-  .nav-links {
-      display: none;
-      flex-direction: column;
-      gap: 10px;
-      position: absolute;
-      top: 60px;
-      right: 0;
-      background-color: #fff;
-      width: 100%;
-      border-top: 1px solid #ddd;
-  }
-
-  .nav-links.active {
-      display: flex;
-  }
-
-  .menu-toggle {
-      display: flex;
-  }
-
-  .hero h1 {
-      font-size: 2.5rem;
-  }
-
-  .hero p {
-      font-size: 1rem;
-  }
 }
 
 
