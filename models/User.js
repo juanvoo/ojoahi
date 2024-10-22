@@ -53,10 +53,11 @@ const db = require('../config/database');
 const bcrypt = require('bcrypt');
 
 class User {
-  static async create(username, email, password) {
+  static async create(username, email, password, userType) {
+    const hashedPassword = await bcrypt.hash(password, 10);
     const [result] = await db.execute(
-      'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-      [username, email, password]
+      'INSERT INTO users (username, email, password, user_type) VALUES (?, ?, ?, ?)',
+      [username, email, hashedPassword, userType]
     );
     return result.insertId;
   }

@@ -1,15 +1,14 @@
-/* Estilos generales */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    background-color: #0d0d0dff;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
 }
 
-/* Contenedor del formulario */
-form {
+
+.form {
     background-color: #ffffff;
     padding: 20px;
     border-radius: 8px;
@@ -21,6 +20,14 @@ form {
     top: 50%;
     left: 50%;
     transform: translate(-49%, -49%);
+    margin-top: 100px; 
+    width: 100%;
+    max-width: 600px;
+    max-width: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .account{
@@ -28,21 +35,17 @@ form {
     top: 50%;
     left: 50%;
     transform: translate(-49%, -49%);
-    margin-top: 10%;
+    margin-top: 20%;
 }
 
 .account2{
     margin-top: 30%;
 }
-
-/* Título del formulario */
-h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #00f8b6ff;
+h2{
+    background-color: #0d0d0dff;
 }
 
-/* Estilo para los mensajes de alerta */
+
 .alert-danger {
     background-color: #f8d7da;
     color: #721c24;
@@ -52,7 +55,7 @@ h2 {
     text-align: center;
 }
 
-/* Estilos para los grupos de entrada */
+
 form div {
     margin-bottom: 15px;
 }
@@ -74,7 +77,7 @@ input[type="password"] {
     font-size: 0.9rem;
 }
 
-/* Estilo para el botón */
+
 button {
     width: 100%;
     padding: 10px;
@@ -91,7 +94,6 @@ button:hover {
     background-color: #357ABD;
 }
 
-/* Estilo para el texto y enlace */
 p {
     text-align: center;
     margin-top: 20px;
@@ -106,4 +108,11 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+.mantener{
+    display: grid;
+    min-height: 100vh;
+    grid-template-rows: auto 1fr auto;
+    background-color: #0d0d0dff;
 }

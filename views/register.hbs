@@ -36,7 +36,7 @@
 
 <link rel="stylesheet" href="/css/forms.css">
 <title>Registrarse</title>
-<h2>{{__ 'Register'}}</h2>
+<h2>{{__ 'Registrarse'}}</h2>
 
 {{#if errors}}
   {{#each errors}}
@@ -44,8 +44,9 @@
   {{/each}}
 {{/if}}
 
-<form action="/register" method="POST">
-  <div>
+<div class="mantener"> 
+<form action="/register" method="POST" class="form">
+  <div class="ll">
     <label for="username">{{__ 'Username'}}:</label>
     <input type="text" id="username" name="username" value="{{username}}" required>
   </div>
@@ -61,7 +62,18 @@
     <label for="password2">{{__ 'ConfirmPassword'}}:</label>
     <input type="password" id="password2" name="password2" required>
   </div>
+  <div>
+    <label>{{__ 'UserType'}}:</label>
+    <div>
+      <input type="radio" id="userTypeBlind" name="userType" value="blind" required>
+      <label for="userTypeBlind">{{__ 'BlindUser'}}</label>
+    </div>
+    <div>
+      <input type="radio" id="userTypeVolunteer" name="userType" value="volunteer" required>
+      <label for="userTypeVolunteer">{{__ 'VolunteerUser'}}</label>
+    </div>
+  </div>
   <button type="submit">{{__ 'Register'}}</button>
 </form>
-
-<p class="account2">{{__ 'AlreadyHaveAccount'}} <a href="/login">{{__ 'Login'}}</a></p>
+</div>
+<p>{{__ 'AlreadyHaveAccount'}} <a href="/login">{{__ 'Login'}}</a></p>

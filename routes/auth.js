@@ -47,10 +47,10 @@ router.get('/register', (req, res) => {
 
 // Register handle
 router.post('/register', async (req, res) => {
-  const { username, email, password, password2 } = req.body;
+  const { username, email, password, password2, userType } = req.body;
   let errors = [];
 
-  if (!username || !email || !password || !password2) {
+  if (!username || !email || !password || !password2 || !userType) {
     errors.push({ msg: 'Por favor rellena todos los campos' });
   }
 
@@ -60,6 +60,10 @@ router.post('/register', async (req, res) => {
 
   if (password.length < 6) {
     errors.push({ msg: 'La contraseña debe tener al menos 6 caracteres' });
+  }
+
+  if (userType !== 'blind' && userType !== 'volunteer') {
+    errors.push({ msg: 'Tipo de usuario inválido' });
   }
 
   if (errors.length > 0) {
@@ -81,8 +85,7 @@ router.post('/register', async (req, res) => {
           title: 'Registro'
         });
       } else {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await User.create(username, email, hashedPassword);
+        const userId = await User.create(username, email, password, userType);
         req.flash('success_msg', 'Ahora estás registrado y puedes iniciar sesión');
         res.redirect('/login');
       }
