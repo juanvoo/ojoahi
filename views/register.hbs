@@ -36,15 +36,15 @@
 
 <link rel="stylesheet" href="/css/forms.css">
 <title>Registrarse</title>
-<h2>{{__ 'Registrarse'}}</h2>
+<div class="mantener">
+<h2 class="registro" style="color: #00f8b6ff;">{{__ 'Registrarse'}}</h2>
 
 {{#if errors}}
   {{#each errors}}
     <div class="alert alert-danger">{{msg}}</div>
   {{/each}}
 {{/if}}
-
-<div class="mantener"> 
+ 
 <form action="/register" method="POST" class="form">
   <div class="ll">
     <label for="username">{{__ 'Username'}}:</label>

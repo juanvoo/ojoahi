@@ -50,13 +50,29 @@ body {
   transition: color 0.3s;
 }
 
-.nav-links .cta {
-  background-color: #0d0d0dff; /* Botón azul */
+.nav-links a:hover{
+  background-color: #0d0d0dff;
   padding: 10px 20px;
   border-radius: 20px;
-  color: white;
+  color: #00f8b6ff;
   text-decoration: none;
   font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.nav-links .cta {
+  background-color: #0d0d0dff; 
+  padding: 10px 20px;
+  border-radius: 20px;
+  color: #00f8b6ff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.nav-links .cta:hover{
+  color: #0d0d0dff;
+  background-color: #00f8b6ff;
 }
 
 .hamburger-menu {
@@ -100,8 +116,8 @@ body {
 }
 
 .cta-large {
-  background-color: #276EF1;
-  color: white;
+  background-color: #00f8b6ff;
+  color: #0d0d0dff;
   padding: 15px 30px;
   border-radius: 30px;
   text-decoration: none;
@@ -110,7 +126,8 @@ body {
 }
 
 .cta-large:hover {
-  background-color: #1D4EB2;
+  background-color: #0d0d0dff;
+  color: #00f8b6ff;
 }
 
 /* Image Section */
@@ -207,7 +224,7 @@ body {
 
 .services {
   padding: 50px 0;
-  background-color: #0C1635;
+    background-color: #0d0d0dff;
   text-align: center;
   color: #00f8b6ff;
 }
@@ -231,6 +248,20 @@ body {
 .card h3 {
   margin-bottom: 10px;
   font-size: 1.5rem;
+}
+
+.iniciar{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 100PX;
+}
+
+.registro{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
 }
 
 
