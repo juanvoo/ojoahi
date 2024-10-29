@@ -1,11 +1,5 @@
-{{!-- <link rel="stylesheet" href="/css/styles.css">
-<footer>
-        <div class="footer">
-            <p>&copy; 2024 ELTEAM. All rights reserved.</p>
-        </div>
-    </footer> --}}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <div>  
+    {{!-- <div>  
     <div style="background-color: #00f8b6ff;">
         <div class="row mb-4">
             <div class="col-md-4 col-sm-4 col-xs-4">
@@ -14,7 +8,7 @@
                         <h1 class="font-weight-bold mr-2 px-3" style="color:#00f8b6ff; background-color:#0d0d0dff"> Ojo </h1>
                         <h1 style="color: #0d0d0dff">Ahi</h1>
                     </div>
-                    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi non pariatur numquam animi nam at impedit odit nisi.</p>
+                    <p class="card-text">Impulsando la independencia de las personas con baja visión a través de tecnología accesible.</p>
                     <div class="social mt-2 mb-3"> <i class="fa fa-facebook-official fa-lg"></i> <i class="fa fa-instagram fa-lg"></i> <i class="fa fa-twitter fa-lg"></i> <i class="fa fa-linkedin-square fa-lg"></i> <i class="fa fa-facebook"></i> </div>
                 </div>
             </div>
@@ -51,7 +45,7 @@
         <div class="row" style="font-size:10px;">
             <div class="col-md-6 col-sm-6 col-xs-6">
                 <div class="pull-left">
-                    <p><i class="fa fa-copyright"></i> 2020 thezpdesign</p>
+                    <p><i class="fa fa-copyright"></i>&copy; 2024 OjoAhi. {{__ 'AllRightsReserved'}}</p>
                 </div>
             </div>
             <div class="col-md-6 col-sm-6 col-xs-6">
@@ -63,4 +57,32 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
+<link rel="stylesheet" href="/css/footer.css">
+<footer>
+    <div class="footerContainer">
+        <div class="socialIcons">
+            {{!-- <a href=""><i class="fa-brands fa-facebook"></i></a>
+            <a href=""><i class="fa-brands fa-instagram"></i></a>
+            <a href=""><i class="fa-brands fa-twitter"></i></a>
+            <a href=""><i class="fa-brands fa-google-plus"></i></a>
+            <a href=""><i class="fa-brands fa-youtube"></i></a> --}}
+            <h1 class="font-weight-bold mr-2 px-3" style="color:#00f8b6ff; background-color:#0d0d0dff"> Ojo </h1>
+            <h1 style="color: #0d0d0dff">Ahi</h1>
+        </div>
+        <p class="socialIcons" style="font-size: 20px;">Haciendo el mundo más accesible, un paso a la vez.</p>
+        <div class="footerNav">
+            <ul><li><a href="/">Inicio</a></li>
+                <li><a href="/opinions">Opiniones</a></li>
+                <li><a href="/about">Sobre Nosotros</a></li>
+                <li><a href="/help">¿Necesitas ayuda?</a></li>
+                <li><a href="/creators">Creadores</a></li>
+            </ul>
+        </div>
+        
+    </div>
+    <div class="footerBottom">
+        <p>Copyright &copy; 2024 OjoAhi. {{__ 'AllRightsReserved'}}</p>
+        <p>Diseñado por <span class="designer">ELTEAM</span></p>
+    </div>
+</footer>

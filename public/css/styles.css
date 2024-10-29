@@ -264,6 +264,53 @@ body {
   margin-top: 30px;
 }
 
+/* Estilos para la lista de voluntarios */
+.volunteer-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.volunteer-card {
+  background: #fff;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.volunteer-card h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.volunteer-card p {
+  margin-bottom: 15px;
+}
+
+.volunteer-card .btn {
+  display: block;
+  text-align: center;
+}
+
+/* Estilos para el formulario de solicitud de ayuda */
+.form-container textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-container input[type="date"],
+.form-container input[type="time"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
 
 
 

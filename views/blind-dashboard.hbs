@@ -1,0 +1,72 @@
+<link rel="stylesheet" href="/css/dashblind.css">
+  <div class="blind">
+<h1 style="color: #00f8b6ff; background-color: #0d0d0dff;">Dashboard de Usuario Ciego</h1>
+<p style="background-color: #0d0d0dff; color:#fff">Bienvenido, {{user.username}}!</p>
+
+
+<div class="dashboard-options">
+  <a href="/volunteerList" class="btn">Ver lista de voluntarios</a>
+<section>
+  <h2>{{__ 'MakeReservation'}}</h2>
+  <form action="/reservations/create" method="POST">
+    <select name="volunteerId" required>
+      {{#each volunteers}}
+        <option value="{{this.id}}">{{this.name}}</option>
+      {{/each}}
+    </select>
+    <input type="date" name="date" required>
+    <input type="time" name="time" required>
+    <textarea name="description" required placeholder="{{__ 'DescribeYourNeeds'}}"></textarea>
+    <button type="submit">{{__ 'RequestReservation'}}</button>
+  </form>
+</section>
+
+<section>
+  <h2>{{__ 'YourReservations'}}</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>{{__ 'Date'}}</th>
+        <th>{{__ 'Time'}}</th>
+        <th>{{__ 'Volunteer'}}</th>
+        <th>{{__ 'Status'}}</th>
+        <th>{{__ 'Actions'}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each reservations}}
+        <tr>
+          <td>{{formatDate this.date}}</td>
+          <td>{{this.time}}</td>
+          <td>{{this.volunteer_name}}</td>
+          <td>{{__ this.status}}</td>
+          <td>
+            {{#if (eq this.status 'pending')}}
+              <form action="/reservations/cancel/{{this.id}}" method="POST">
+                <button type="submit">{{__ 'Cancel'}}</button>
+              </form>
+            {{/if}}
+            {{#if (eq this.status 'completed')}}
+              <a href="/reviews/create/{{this.id}}">{{__ 'LeaveReview'}}</a>
+            {{/if}}
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>{{__ 'ExploreVolunteers'}}</h2>
+  {{#each volunteers}}
+    <div class="volunteer-card">
+      <h3>{{this.name}}</h3>
+      <p>{{this.bio}}</p>
+      <p>{{__ 'Skills'}}: {{this.skills}}</p>
+      <p>{{__ 'Availability'}}: {{this.availability}}</p>
+      <a href="/volunteers/{{this.id}}/reviews">{{__ 'SeeReviews'}}</a>
+    </div>
+  {{/each}}
+</section>
+</div>
+</div>

@@ -1,21 +1,31 @@
+<link rel="icon" href="/images/OjoAhiLogo.png" type="image/x-icon">
+
 <!DOCTYPE html>
-<html lang="{{__ 'lang'}}">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
     <link rel="stylesheet" href="/css/styles.css">
-    <link rel="icon" href="/images/OjoAhiLogo.png" type="image/x-icon">
-    {{!-- <title>OjoAhi</title> --}}
 </head>
 <body>
-    {{>header}}
-    {{{body}}}
-    {{>footer}}
-    
+
+        {{#if success_msg}}
+            <div class="alert alert-success">{{success_msg}}</div>
+        {{/if}}
+        {{#if error_msg}}
+            <div class="alert alert-danger">{{error_msg}}</div>
+        {{/if}}
+        {{> header}}
+        {{{body}}}
+        {{>footer}}
+
     <script src="/js/main.js"></script>
-    <script src="/js/accessibility.js"></script>
 </body>
 </html>
+    
+
+
 
 
 

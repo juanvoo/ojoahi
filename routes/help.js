@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  res.render('home', { title: 'Bienvenido a OjoAhi' });
+router.get('/help', (req, res) => {
+  res.render('help', { title: 'Centro de ayudas de OjoAhi' });
 });
 
 module.exports = router;

@@ -1,25 +1,3 @@
-// const db = require('../config/database');
-
-// class Review {
-//   static create(reviewData, callback) {
-//     const query = 'INSERT INTO reviews (user_id, volunteer_id, rating, comment) VALUES (?, ?, ?, ?)';
-//     db.query(query, [reviewData.user_id, reviewData.volunteer_id, reviewData.rating, reviewData.comment], (error, results) => {
-//       if (error) return callback(error);
-//       callback(null, results.insertId);
-//     });
-//   }
-
-//   static findByVolunteer(volunteerId, callback) {
-//     const query = 'SELECT * FROM reviews WHERE volunteer_id = ?';
-//     db.query(query, [volunteerId], (error, results) => {
-//       if (error) return callback(error);
-//       callback(null, results);
-//     });
-//   }
-// }
-
-// module.exports = Review;
-
 const db = require('../config/database');
 
 class Review {
@@ -31,14 +9,9 @@ class Review {
     return result.insertId;
   }
 
-  static async findById(id) {
-    const [rows] = await db.execute('SELECT * FROM reviews WHERE id = ?', [id]);
-    return rows[0];
-  }
-
   static async getByVolunteerId(volunteerId) {
     const [rows] = await db.execute(
-      `SELECT r.*, u.username 
+      `SELECT r.*, u.username as user_name 
        FROM reviews r 
        JOIN users u ON r.user_id = u.id 
        WHERE r.volunteer_id = ?
@@ -48,12 +21,12 @@ class Review {
     return rows;
   }
 
-  static async getAverageRatingByVolunteerId(volunteerId) {
-    const [rows] = await db.execute(
+  static async getAverageRating(volunteerId) {
+    const [result] = await db.execute(
       'SELECT AVG(rating) as average_rating FROM reviews WHERE volunteer_id = ?',
       [volunteerId]
     );
-    return rows[0].average_rating;
+    return result[0].average_rating;
   }
 }
 

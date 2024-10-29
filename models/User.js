@@ -1,75 +1,62 @@
-// const db = require('../config/database');
-// const bcrypt = require('bcrypt');
-
-// class User {
-//   static create(userData, callback) {
-//     bcrypt.hash(userData.password, 10, (err, hash) => {
-//       if (err) return callback(err);
-      
-//       const query = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
-//       db.query(query, [userData.username, userData.email, hash], (error, results) => {
-//         if (error) return callback(error);
-//         callback(null, results.insertId);
-//       });
-//     });
-//   }
-
-//   static findByEmail(email, callback) {
-//     const query = 'SELECT * FROM users WHERE email = ?';
-//     db.query(query, [email], (error, results) => {
-//       if (error) return callback(error);
-//       callback(null, results[0]);
-//     });
-//   }
-
-//   static getAll(callback) {
-//     const query = 'SELECT id, username, email FROM users';
-//     db.query(query, (error, results) => {
-//       if (error) return callback(error);
-//       callback(null, results);
-//     });
-//   }
-
-//   static update(id, userData, callback) {
-//     const query = 'UPDATE users SET username = ?, email = ? WHERE id = ?';
-//     db.query(query, [userData.username, userData.email, id], (error, results) => {
-//       if (error) return callback(error);
-//       callback(null, results.affectedRows > 0);
-//     });
-//   }
-
-//   static delete(id, callback) {
-//     const query = 'DELETE FROM users WHERE id = ?';
-//     db.query(query, [id], (error, results) => {
-//       if (error) return callback(error);
-//       callback(null, results.affectedRows > 0);
-//     });
-//   }
-// }
-
-// module.exports = User;
-
 const db = require('../config/database');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 class User {
-  static async create(username, email, password, userType) {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const [result] = await db.execute(
-      'INSERT INTO users (username, email, password, user_type) VALUES (?, ?, ?, ?)',
-      [username, email, hashedPassword, userType]
-    );
-    return result.insertId;
-  }
-
-  static async findByEmail(email) {
-    const [rows] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
-    return rows[0];
+  static async findAll() {
+    const [rows] = await db.execute('SELECT * FROM users');
+    return rows;
   }
 
   static async findById(id) {
     const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [id]);
     return rows[0];
+  }
+
+  static async findByEmail(email) {
+    try {
+      console.log('Buscando usuario por email:', email);
+      const [rows] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+      console.log('Resultado de la búsqueda:', rows[0] ? 'Usuario encontrado' : 'Usuario no encontrado');
+      return rows[0];
+    } catch (error) {
+      console.error('Error al buscar usuario por email:', error);
+      throw error;
+    }
+  }
+
+  static async create(userData) {
+    const { username, email, password, user_type } = userData;
+    try {
+      console.log('Intentando crear usuario:', { username, email, user_type });
+      const [result] = await db.execute(
+        'INSERT INTO users (username, email, password, user_type) VALUES (?, ?, ?, ?)',
+        [username, email, password, user_type]
+      );
+      console.log('Usuario creado con ID:', result.insertId);
+      return { id: result.insertId, username, email, user_type };
+    } catch (error) {
+      console.error('Error detallado al crear usuario:', error);
+      throw error;
+    }
+  }
+
+  static async update(id, userData) {
+    const { username, email, user_type } = userData;
+    await db.execute(
+      'UPDATE users SET username = ?, email = ?, user_type = ? WHERE id = ?',
+      [username, email, user_type, id]
+    );
+    return this.findById(id);
+  }
+
+  static async delete(id) {
+    const [result] = await db.execute('DELETE FROM users WHERE id = ?', [id]);
+    return result.affectedRows > 0;
+  }
+
+  static async getAllVolunteers() {
+    const [rows] = await db.execute('SELECT id, username, email FROM users WHERE user_type = ?', ['volunteer']);
+    return rows;
   }
 }
 

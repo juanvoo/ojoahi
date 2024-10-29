@@ -1,0 +1,22 @@
+<link rel="stylesheet" href="/css/opinions.css">
+<div class="opinions">
+<h1 style="color: #00f8b6ff">Opiniones de Nuestros Usuarios</h1>
+<p style="color: white;">Lee lo que otros usuarios piensan sobre nuestra aplicación.</p>
+
+<section class="review-section">
+  {{#if reviews.length}}
+    {{#each reviews}}
+      <div class="review-card">
+        <div class="review-header">
+          <h3>{{this.user_name}}</h3>
+          <span class="rating">Puntuación: {{this.rating}}/5</span>
+        </div>
+        <p>{{this.comment}}</p>
+        <p class="review-date">Fecha: {{formatDate this.created_at}}</p>
+      </div>
+    {{/each}}
+  {{else}}
+    <p style="color: white;">No hay opiniones disponibles por el momento.</p>
+  {{/if}}
+</section>
+</div>

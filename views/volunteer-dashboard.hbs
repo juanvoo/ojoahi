@@ -1,0 +1,55 @@
+<link rel="stylesheet" href="/css/dashvolunteer.css">
+<h1>Dashboard de Voluntario</h1>
+<p>Bienvenido, {{user.username}}!</p>
+
+<section>
+  <h2>{{__ 'YourReviews'}}</h2>
+  {{#if reviews.length}}
+    {{#each reviews}}
+      <div class="review">
+        <p>{{__ 'Rating'}}: {{this.rating}}/5</p>
+        <p>{{this.comment}}</p>
+        <p>{{__ 'By'}}: {{this.user_name}} - {{formatDate this.created_at}}</p>
+      </div>
+    {{/each}}
+  {{else}}
+    <p>{{__ 'NoReviewsYet'}}</p>
+  {{/if}}
+</section>
+
+<section>
+  <h2>{{__ 'ReservationRequests'}}</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>{{__ 'Date'}}</th>
+        <th>{{__ 'Time'}}</th>
+        <th>{{__ 'User'}}</th>
+        <th>{{__ 'Description'}}</th>
+        <th>{{__ 'Status'}}</th>
+        <th>{{__ 'Actions'}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each reservations}}
+        <tr>
+          <td>{{formatDate this.date}}</td>
+          <td>{{this.time}}</td>
+          <td>{{this.user_name}}</td>
+          <td>{{this.description}}</td>
+          <td>{{__ this.status}}</td>
+          <td>
+            {{#if (eq this.status 'pending')}}
+              <form action="/reservations/accept/{{this.id}}" method="POST" style="display: inline;">
+                <button type="submit">{{__ 'Accept'}}</button>
+              </form>
+              <form action="/reservations/reject/{{this.id}}" method="POST" style="display: inline;">
+                <button type="submit">{{__ 'Reject'}}</button>
+              </form>
+            {{/if}}
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</section>
