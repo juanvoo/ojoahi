@@ -54,7 +54,7 @@ body {
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 15px;
-    border: 3px solid #007bff;
+    border: 8px solid #0d0d0dff;
   }
   
   .creator-card h2 {
