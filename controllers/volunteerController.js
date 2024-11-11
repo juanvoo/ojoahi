@@ -1,49 +1,6 @@
-// const Volunteer = require('../models/Volunteer');
-
-// exports.getAllVolunteers = (req, res) => {
-//   Volunteer.findAll((err, volunteers) => {
-//     if (err) {
-//       return res.status(500).json({ error: 'Error al obtener los voluntarios' });
-//     }
-//     res.json(volunteers);
-//   });
-// };
-
-// exports.getVolunteerById = (req, res) => {
-//   Volunteer.findById(req.params.id, (err, volunteer) => {
-//     if (err) {
-//       return res.status(500).json({ error: 'Error al obtener el voluntario' });
-//     }
-//     if (!volunteer) {
-//       return res.status(404).json({ error: 'Voluntario no encontrado' });
-//     }
-//     res.json(volunteer);
-//   });
-// };
-
-// exports.createVolunteer = (req, res) => {
-//   Volunteer.create(req.body, (err, volunteerId) => {
-//     if (err) {
-//       return res.status(500).json({ error: 'Error al crear el voluntario' });
-//     }
-//     res.status(201).json({ message: 'Voluntario creado exitosamente', volunteerId });
-//   });
-// };
-
-// exports.updateVolunteer = (req, res) => {
-//   Volunteer.update(req.params.id, req.body, (err, success) => {
-//     if (err) {
-//       return res.status(500).json({ error: 'Error al actualizar el voluntario' });
-//     }
-//     if (success) {
-//       res.json({ message: 'Voluntario actualizado exitosamente' });
-//     } else {
-//       res.status(404).json({ error: 'Voluntario no encontrado' });
-//     }
-//   });
-// };
-
 const User = require('../models/User');
+const Review = require('../models/Review');
+const HelpRequest = require('../models/HelpRequest');
 
 exports.getAllVolunteers = async (req, res) => {
   try {
@@ -57,5 +14,59 @@ exports.getAllVolunteers = async (req, res) => {
     console.error(error);
     req.flash('error_msg', 'Error al obtener la lista de voluntarios');
     res.redirect('/blind-dashboard');
+  }
+};
+
+exports.getVolunteerDashboard = async (req, res) => {
+  try {
+    const volunteerId = req.session.user.id;
+    if (!volunteerId) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    const volunteer = await User.findById(volunteerId);
+    if (!volunteer) {
+      throw new Error('Voluntario no encontrado');
+    }
+
+    const reviews = await Review.getReviewsForVolunteer(volunteerId);
+    const helpRequests = await HelpRequest.getRequestsForVolunteer(volunteerId);
+
+    res.render('volunteer-dashboard', {
+      title: 'Dashboard del Voluntario',
+      volunteer,
+      reviews,
+      helpRequests
+    });
+  } catch (error) {
+    console.error('Error en el dashboard del voluntario:', error);
+    req.flash('error_msg', 'Hubo un error al cargar tu dashboard. Por favor, intenta de nuevo más tarde.');
+    res.redirect('/');
+  }
+};
+
+exports.acceptHelpRequest = async (req, res) => {
+  try {
+    const requestId = req.params.id;
+    await HelpRequest.updateStatus(requestId, 'accepted');
+    req.flash('success_msg', 'Solicitud de ayuda aceptada con éxito');
+    res.redirect('/volunteer/dashboard');
+  } catch (error) {
+    console.error('Error al aceptar la solicitud de ayuda:', error);
+    req.flash('error_msg', 'Hubo un error al aceptar la solicitud. Por favor, intenta de nuevo.');
+    res.redirect('/volunteer/dashboard');
+  }
+};
+
+exports.rejectHelpRequest = async (req, res) => {
+  try {
+    const requestId = req.params.id;
+    await HelpRequest.updateStatus(requestId, 'rejected');
+    req.flash('success_msg', 'Solicitud de ayuda rechazada');
+    res.redirect('/volunteer/dashboard');
+  } catch (error) {
+    console.error('Error al rechazar la solicitud de ayuda:', error);
+    req.flash('error_msg', 'Hubo un error al rechazar la solicitud. Por favor, intenta de nuevo.');
+    res.redirect('/volunteer/dashboard');
   }
 };

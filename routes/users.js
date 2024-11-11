@@ -7,6 +7,10 @@ router.get('/', isAuthenticated, isAdmin, userController.getAllUsers);
 router.get('/:id', isAuthenticated, userController.getUserById);
 router.post('/', isAuthenticated, isAdmin, userController.createUser);
 router.put('/:id', isAuthenticated, userController.updateUser);
-router.delete('/:id', isAuthenticated, isAdmin, userController.deleteUser);
+router.post('/delete-account', isAuthenticated, userController.deleteAccount);
+router.get('/blind-dashboard', isAuthenticated, userController.getBlindDashboard);
+router.get('/volunteer-dashboard', isAuthenticated, userController.getVolunteerDashboard);
+
+
 
 module.exports = router;

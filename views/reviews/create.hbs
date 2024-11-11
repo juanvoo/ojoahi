@@ -1,0 +1,41 @@
+<div class="create" style="background-color: #0d0d0dff;">
+<h1 style="color: #00f8b6ff;">Crear Reseña</h1>
+
+<form style="color: white;" action="{{#if reservationId}}/reviews/create/{{reservationId}}{{else}}/reviews/create{{/if}}" method="POST">
+  {{#if volunteerName}}
+    <p>Voluntario: {{volunteerName}}</p>
+  {{else}}
+    <div>
+      <label for="volunteerId">Seleccionar Voluntario:</label>
+      {{#if volunteers.length}}
+        <select name="volunteerId" id="volunteerId" required>
+          <option value="">Seleccione un voluntario</option>
+          {{#each volunteers}}
+            <option value="{{this.id}}">{{this.username}}</option>
+          {{/each}}
+        </select>
+      {{else}}
+        <p>No hay voluntarios disponibles en este momento.</p>
+      {{/if}}
+    </div>
+  {{/if}}
+
+  <div>
+    <label for="rating">Calificación:</label>
+    <select name="rating" id="rating" required>
+      <option value="1">1 - Muy malo</option>
+      <option value="2">2 - Malo</option>
+      <option value="3">3 - Regular</option>
+      <option value="4">4 - Bueno</option>
+      <option value="5">5 - Excelente</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="comment">Comentario:</label>
+    <textarea name="comment" id="comment" rows="4" required></textarea>
+  </div>
+
+  <button class="mt-3 btn mb-3" type="submit" style="border-radius: 5px; color:#0d0d0dff; background-color:#00f8b6ff">Enviar Reseña</button>
+</form>
+</div>

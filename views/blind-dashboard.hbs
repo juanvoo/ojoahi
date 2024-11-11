@@ -1,28 +1,22 @@
 <link rel="stylesheet" href="/css/dashblind.css">
+<link rel="stylesheet" href="/css/delete.css">
   <div class="blind">
-<h1 style="color: #00f8b6ff; background-color: #0d0d0dff;">Dashboard de Usuario Ciego</h1>
-<p style="background-color: #0d0d0dff; color:#fff">Bienvenido, {{user.username}}!</p>
-
+<h1 style="background-color: #0d0d0dff; color:#00f8b6ff">Bienvenido, {{user.username}}!</h1>
+<br>
 
 <div class="dashboard-options">
-  <a href="/volunteerList" class="btn">Ver lista de voluntarios</a>
+  <h2 style="color: white;">{{__ 'MakeReservation'}}</h2>
+  <a href="/volunteerList" class="btn" style="color: white;">Ver lista de voluntarios y solicitar asistencia</a>
+<br>
+<br>
 <section>
-  <h2>{{__ 'MakeReservation'}}</h2>
-  <form action="/reservations/create" method="POST">
-    <select name="volunteerId" required>
-      {{#each volunteers}}
-        <option value="{{this.id}}">{{this.name}}</option>
-      {{/each}}
-    </select>
-    <input type="date" name="date" required>
-    <input type="time" name="time" required>
-    <textarea name="description" required placeholder="{{__ 'DescribeYourNeeds'}}"></textarea>
-    <button type="submit">{{__ 'RequestReservation'}}</button>
-  </form>
+  <h2 style="color: white;">Crear una Nueva Reseña</h2>
+  <a href="/reviews/create" class="btn" style="border-radius: 5px; background-color:#00f8b6ff">Crear Nueva Reseña</a>
 </section>
-
+<br>
+<br>
 <section>
-  <h2>{{__ 'YourReservations'}}</h2>
+  <h2 style="color: white;">{{__ 'YourReservations'}}</h2>
   <table>
     <thead>
       <tr>
@@ -56,17 +50,12 @@
   </table>
 </section>
 
-<section>
-  <h2>{{__ 'ExploreVolunteers'}}</h2>
-  {{#each volunteers}}
-    <div class="volunteer-card">
-      <h3>{{this.name}}</h3>
-      <p>{{this.bio}}</p>
-      <p>{{__ 'Skills'}}: {{this.skills}}</p>
-      <p>{{__ 'Availability'}}: {{this.availability}}</p>
-      <a href="/volunteers/{{this.id}}/reviews">{{__ 'SeeReviews'}}</a>
-    </div>
-  {{/each}}
-</section>
+</div>
+<div class="delete-account-section">
+  <h2>Eliminar cuenta</h2>
+  <p>¡Atención! Esta acción es irreversible y eliminará permanentemente tu cuenta y todos tus datos asociados.</p>
+  <form action="/users/delete-account" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.');">
+    <button type="submit" class="btn btn-danger">Eliminar mi cuenta</button>
+  </form>
 </div>
 </div>

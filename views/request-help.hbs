@@ -1,7 +1,8 @@
 <link rel="stylesheet" href="/css/styles.css">
-<h1>Solicitar Ayuda a {{volunteer.username}}</h1>
+<div class="help" style="background-color: #0d0d0dff;">
+<h1 style="color: #00f8b6ff;">Solicitar Ayuda a {{volunteer.username}}</h1>
 
-<div class="form-container">
+<div class="form-container" style="color: white;">
   <form action="/request-help" method="POST">
     <input type="hidden" name="volunteerId" value="{{volunteer.id}}">
     
@@ -19,9 +20,9 @@
       <label for="time">Hora:</label>
       <input type="time" id="time" name="time" required>
     </div>
-    
-    <button type="submit" class="btn">Enviar Solicitud</button>
+    <button type="submit" class="btn mt-3" style="background-color: #00f8b6ff; color:#0d0d0dff">Enviar Solicitud</button>
   </form>
 </div>
 
-<a href="/volunteerList" class="btn">Volver a la lista de voluntarios</a>
+<a href="/volunteerList" class="btn" style="color: white;">Volver a la lista de voluntarios</a>
+</div>

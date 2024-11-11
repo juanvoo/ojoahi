@@ -1,13 +1,14 @@
 <link rel="stylesheet" href="/css/styles.css">
-<h1>Lista de Voluntarios</h1>
+<div style="background-color: #0d0d0dff;" class="list">
+<h1 style="color: #00f8b6ff;">Lista de Voluntarios</h1>
 
 {{#if volunteers.length}}
-  <div class="volunteer-list">
+  <div class="volunteer-list mt-5">
     {{#each volunteers}}
-      <div class="volunteer-card">
+      <div style="background-color: #00f8b6ff;" class="volunteer-card mb-5">
         <h2>{{this.username}}</h2>
         <p>Email: {{this.email}}</p>
-        <a href="/request-help/{{this.id}}" class="btn">Solicitar ayuda</a>
+        <a href="/request-help/{{this.id}}" class="btn btn-dark">Solicitar ayuda</a>
       </div>
     {{/each}}
   </div>
@@ -15,4 +16,5 @@
   <p>No hay voluntarios disponibles en este momento.</p>
 {{/if}}
 
-<a href="/blind-dashboard" class="btn">Volver al Dashboard</a>
+<a href="/blind-dashboard" class="btn mb-5" style="color: white;">Volver al Dashboard</a>
+</div>

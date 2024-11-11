@@ -4,8 +4,19 @@ const flash = require('connect-flash');
 const { engine } = require('express-handlebars');
 const path = require('path');
 const i18n = require('i18n');
+const Handlebars = require('handlebars');
 
 const app = express();
+
+Handlebars.registerHelper('formatDate', function(date) {
+  return new Date(date).toLocaleString('es-ES', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+});
 
 // Configuración de Handlebars
 app.engine('.hbs', engine({ 
@@ -70,6 +81,7 @@ const creatorsRoutes = require('./routes/creators');
 const aboutRoutes = require('./routes/about');
 const opinionsRoutes = require ('./routes/opinions');
 const helpRoutes = require ('./routes/help');
+const reviewRoutes = require('./routes/reviews');
 
 app.use('/', indexRoutes);
 app.use('/', authRoutes);
@@ -79,6 +91,7 @@ app.use('/', creatorsRoutes);
 app.use('/', aboutRoutes);
 app.use('/', opinionsRoutes);
 app.use('/', helpRoutes);
+app.use('/reviews', reviewRoutes);
 
 // Manejo de errores 404
 app.use((req, res, next) => {

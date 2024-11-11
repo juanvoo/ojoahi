@@ -1,9 +1,10 @@
 <link rel="stylesheet" href="/css/dashvolunteer.css">
-<h1>Dashboard de Voluntario</h1>
-<p>Bienvenido, {{user.username}}!</p>
-
+<link rel="stylesheet" href="/css/delete.css">
+<div class="volunteer">
+<h1 style="background-color: #0d0d0dff; color:#00f8b6ff">Bienvenido, {{user.username}}!</h1>
+<br>
 <section>
-  <h2>{{__ 'YourReviews'}}</h2>
+  <h2 style="color: white;">{{__ 'YourReviews'}}</h2>
   {{#if reviews.length}}
     {{#each reviews}}
       <div class="review">
@@ -13,12 +14,13 @@
       </div>
     {{/each}}
   {{else}}
-    <p>{{__ 'NoReviewsYet'}}</p>
+    <p style="color: white;">{{__ 'NoReviewsYet'}}</p>
   {{/if}}
 </section>
 
+<br>
 <section>
-  <h2>{{__ 'ReservationRequests'}}</h2>
+  <h2 style="color: white;">{{__ 'ReservationRequests'}}</h2>
   <table>
     <thead>
       <tr>
@@ -53,3 +55,11 @@
     </tbody>
   </table>
 </section>
+<div class="delete-account-section">
+  <h2>Eliminar cuenta</h2>
+  <p>¡Atención! Esta acción es irreversible y eliminará permanentemente tu cuenta y todos tus datos asociados.</p>
+  <form action="/users/delete-account" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.');">
+    <button type="submit" class="btn btn-danger">Eliminar mi cuenta</button>
+  </form>
+</div>
+</div>

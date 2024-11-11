@@ -5,7 +5,11 @@ body {
     color: #333;
     background-color: #f7f9fc;
     margin: 0;
-    padding: 20px;
+    /* padding: 20px; */
+  }
+
+  .volunteer{
+    background-color: #0d0d0dff;
   }
   
   /* Header */

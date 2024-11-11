@@ -46,15 +46,73 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-exports.deleteUser = async (req, res) => {
+exports.deleteAccount = async (req, res) => {
   try {
-    const deleted = await User.delete(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
+    const userId = req.session.user.id;
+    console.log(`Intentando eliminar usuario con ID: ${userId}`);
+    
+    const deleted = await User.deleteById(userId);
+
+    if (deleted) {
+      console.log(`Usuario con ID ${userId} eliminado exitosamente`);
+      req.session.destroy((err) => {
+        if (err) {
+          console.error('Error al cerrar sesión:', err);
+        }
+        res.redirect('/');
+      });
+    } else {
+      console.log(`No se pudo eliminar el usuario con ID ${userId}`);
+      req.flash('error_msg', 'No se pudo eliminar la cuenta');
+      res.redirect(req.get('Referrer') || '/');
     }
-    res.json({ message: 'Usuario eliminado correctamente' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error al eliminar el usuario' });
+    console.error('Error detallado al eliminar la cuenta:', error);
+    req.flash('error_msg', 'Error al eliminar la cuenta. Por favor, inténtelo de nuevo más tarde.');
+    res.redirect(req.get('Referrer') || '/');
+  }
+};
+
+exports.getBlindDashboard = async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const reservations = await User.getReservationsForUser(userId);
+    const completedReservations = await User.getCompletedReservationsForUser(userId);
+    const reviews = await User.getReviewsForUser(userId);
+    const volunteerReviews = await User.getVolunteerReviews();
+
+    res.render('dashboard/blind', {
+      user: req.session.user,
+      reservations,
+      completedReservations,
+      reviews,
+      volunteerReviews
+    });
+  } catch (error) {
+    console.error('Error al obtener el dashboard del usuario ciego:', error);
+    req.flash('error_msg', 'Hubo un error al cargar tu dashboard');
+    res.redirect('/');
+  }
+};
+
+exports.getVolunteerDashboard = async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const reservations = await User.getReservationsForVolunteer(userId);
+    const reviews = await User.getReviewsForVolunteer(userId);
+    const pendingRequests = await User.getPendingHelpRequests();
+    const volunteerReviews = await User.getVolunteerReviews();
+
+    res.render('volunteer-dashboard', {
+      user: req.session.user,
+      reservations,
+      reviews,
+      pendingRequests,
+      volunteerReviews
+    });
+  } catch (error) {
+    console.error('Error al obtener el dashboard del voluntario:', error);
+    req.flash('error_msg', 'Hubo un error al cargar tu dashboard');
+    res.redirect('/');
   }
 };
