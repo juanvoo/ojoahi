@@ -1,0 +1,150 @@
+{{!-- {{> header}} --}}
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <div>
+              <h2 class="h5 mb-0">{{session.subject}}</h2>
+              <small class="text-white-50">
+                Estado: 
+                <span class="badge bg-{{#if (eq session.status 'waiting')}}warning text-dark{{else if (eq session.status 'active')}}success{{else}}secondary{{/if}}">
+                  {{#if (eq session.status 'waiting')}}En espera{{else if (eq session.status 'active')}}Activo{{else}}Cerrado{{/if}}
+                </span>
+              </small>
+            </div>
+          </div>
+          <div>
+            {{#if isAgent}}
+              {{#if (eq session.status 'active')}}
+                <a href="/support/close/{{session.id}}" class="btn btn-sm btn-warning me-2" onclick="return confirm('¿Estás seguro de que deseas cerrar esta consulta?')">
+                  <i class="fas fa-check-circle"></i> Marcar como Resuelta
+                </a>
+              {{/if}}
+            {{/if}}
+            <a href="/support" class="btn btn-sm btn-light">
+              <i class="fas fa-arrow-left"></i> Volver
+            </a>
+          </div>
+        </div>
+        
+        <div class="card-body" style="height: 400px; overflow-y: auto;" id="chat-messages">
+          <div class="chat-info text-center mb-3">
+            <div class="alert alert-light">
+              <h5>Información de la Consulta</h5>
+              <p class="mb-1"><strong>Creada:</strong> {{formatDate session.created_at}}</p>
+              <p class="mb-1"><strong>Usuario:</strong> {{session.user_username}}</p>
+              {{#if session.agent_username}}
+                <p class="mb-0"><strong>Agente:</strong> {{session.agent_username}}</p>
+              {{else}}
+                {{#if isAgent}}
+                  <p class="mb-0 text-success">Has sido asignado a esta consulta</p>
+                {{else}}
+                  <p class="mb-0 text-warning">Esperando asignación de agente</p>
+                {{/if}}
+              {{/if}}
+            </div>
+          </div>
+          
+          {{#if messages.length}}
+            {{#each messages}}
+              <div class="mb-3 {{#if this.is_from_user}}{{#if (eq ../user.id this.user_id)}}text-end{{/if}}{{else}}{{#if (neq ../user.id this.user_id)}}text-end{{/if}}{{/if}}">
+                <div class="d-inline-block p-3 rounded-3 {{#if this.is_from_user}}{{#if (eq ../user.id this.user_id)}}bg-primary text-white{{else}}bg-light{{/if}}{{else}}{{#if (neq ../user.id this.user_id)}}bg-primary text-white{{else}}bg-success text-white{{/if}}{{/if}}" style="max-width: 75%;">
+                  <p class="mb-0">{{this.message}}</p>
+                </div>
+                <div class="text-muted small mt-1">
+                  {{formatTime this.created_at}} - {{this.username}}
+                </div>
+              </div>
+            {{/each}}
+          {{else}}
+            <div class="text-center text-muted my-5">
+              <i class="fas fa-comments fa-3x mb-3"></i>
+              <p>No hay mensajes aún. ¡Envía el primero!</p>
+            </div>
+          {{/if}}
+        </div>
+        
+        <div class="card-footer">
+          {{#if (neq session.status 'closed')}}
+            <form action="/support/send" method="POST">
+              <input type="hidden" name="session_id" value="{{session.id}}">
+              <div class="input-group">
+                <input type="text" name="message" class="form-control" placeholder="Escribe tu mensaje..." required autofocus>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-paper-plane"></i> Enviar
+                </button>
+              </div>
+            </form>
+          {{else}}
+            <div class="alert alert-secondary mb-0">
+              <i class="fas fa-lock me-2"></i> Esta consulta está cerrada y no se pueden enviar más mensajes.
+              {{#if (eq user.role 'blind')}}
+                <a href="/support/create" class="btn btn-sm btn-primary ms-2">Crear Nueva Consulta</a>
+              {{/if}}
+            </div>
+          {{/if}}
+        </div>
+      </div>
+      
+      {{#if isAgent}}
+        <div class="card mt-4">
+          <div class="card-header bg-info text-white">
+            <h3 class="h5 mb-0">Herramientas de Soporte</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h4 class="h6">Respuestas Rápidas</h4>
+                <div class="list-group">
+                  <button type="button" class="list-group-item list-group-item-action" onclick="insertQuickReply('Hola, gracias por contactar con el soporte de OjoAhi. ¿En qué puedo ayudarte?')">
+                    Saludo Inicial
+                  </button>
+                  <button type="button" class="list-group-item list-group-item-action" onclick="insertQuickReply('¿Podrías proporcionar más detalles sobre el problema que estás experimentando?')">
+                    Solicitar Más Información
+                  </button>
+                  <button type="button" class="list-group-item list-group-item-action" onclick="insertQuickReply('¿Has intentado reiniciar la aplicación o cerrar sesión y volver a iniciarla?')">
+                    Solución Básica
+                  </button>
+                  <button type="button" class="list-group-item list-group-item-action" onclick="insertQuickReply('Gracias por tu paciencia. Estamos trabajando en resolver tu problema.')">
+                    Agradecimiento
+                  </button>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <h4 class="h6">Información del Usuario</h4>
+                <div class="card">
+                  <div class="card-body">
+                    <p><strong>Usuario:</strong> {{session.user_username}}</p>
+                    <p><strong>Email:</strong> {{session.user_email}}</p>
+                    <p><strong>Rol:</strong> {{#if (eq session.user_role 'blind')}}Usuario Ciego{{else}}Voluntario{{/if}}</p>
+                    <p><strong>Miembro desde:</strong> {{formatDate session.user_created_at}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<script>
+  // Hacer scroll al final de los mensajes
+  document.addEventListener('DOMContentLoaded', function() {
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+  
+  // Función para insertar respuestas rápidas
+  function insertQuickReply(text) {
+    document.querySelector('input[name="message"]').value = text;
+    document.querySelector('input[name="message"]').focus();
+  }
+</script>
+
+{{!-- {{> footer}} --}}
+

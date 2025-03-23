@@ -18,26 +18,26 @@ router.get('/volunteer-dashboard', isAuthenticated, (req, res) => {
   res.render('volunteer-dashboard', { title: 'Su Dashboard', user: req.session.user });
 });
 
-// Nueva ruta para la lista de voluntarios
-router.get('/volunteerList', isAuthenticated, (req, res, next) => {
-  if (req.session.user.userType !== 'blind') {
-    return res.redirect('/volunteer-dashboard');
-  }
-  next();
-}, volunteerController.getAllVolunteers);
+// // Nueva ruta para la lista de voluntarios
+// router.get('/volunteerList', isAuthenticated, (req, res, next) => {
+//   if (req.session.user.userType !== 'blind') {
+//     return res.redirect('/volunteer-dashboard');
+//   }
+//   next();
+// }, volunteerController.getAllVolunteers);
 
-router.get('/request-help/:volunteerId', isAuthenticated, (req, res, next) => {
-  if (req.session.user.userType !== 'blind') {
-    return res.redirect('/volunteer-dashboard');
-  }
-  next();
-}, helpRequestController.showRequestForm);
+// router.get('/request-help/:volunteerId', isAuthenticated, (req, res, next) => {
+//   if (req.session.user.userType !== 'blind') {
+//     return res.redirect('/volunteer-dashboard');
+//   }
+//   next();
+// }, helpRequestController.showRequestForm);
 
-router.post('/request-help', isAuthenticated, (req, res, next) => {
-  if (req.session.user.userType !== 'blind') {
-    return res.redirect('/volunteer-dashboard');
-  }
-  next();
-}, helpRequestController.submitRequest);
+// router.post('/request-help', isAuthenticated, (req, res, next) => {
+//   if (req.session.user.userType !== 'blind') {
+//     return res.redirect('/volunteer-dashboard');
+//   }
+//   next();
+// }, helpRequestController.submitRequest);
 
 module.exports = router;

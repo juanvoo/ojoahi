@@ -1,48 +1,73 @@
-const db = require('../config/database');
+const pool = require('../config/database');
 
 class Reservation {
-  static async create(userId, volunteerId, date, time, description) {
-    const [result] = await db.execute(
-      'INSERT INTO reservations (user_id, volunteer_id, date, time, description, status) VALUES (?, ?, ?, ?, ?, ?)',
-      [userId, volunteerId, date, time, description, 'pending']
-    );
-    return result.insertId;
+  static async create({ user_id, volunteer_id, date, time, notes, status, help_request_id }) {
+    try {
+      const sql = 'INSERT INTO reservations (user_id, volunteer_id, date, time, notes, status, help_request_id) VALUES (?, ?, ?, ?, ?, ?, ?)';
+      const params = [user_id, volunteer_id, date, time, notes, status || 'pending', help_request_id || null];
+  
+      const [result] = await pool.execute(sql, params);
+      return result.insertId;
+    } catch (error) {
+      console.error('Error al crear la reserva:', error);
+      throw error;
+    }
   }
 
   static async getByUserId(userId) {
-    const [rows] = await db.execute(
-      `SELECT r.*, u.username as volunteer_name 
-       FROM reservations r 
-       JOIN users u ON r.volunteer_id = u.id 
-       WHERE r.user_id = ?
-       ORDER BY r.date DESC, r.time DESC`,
-      [userId]
-    );
-    return rows;
+    try {
+      console.log(`Buscando reservas para el usuario con ID: ${userId}`);
+      
+      const [rows] = await pool.execute(
+        `SELECT r.*, u.username as volunteer_name 
+         FROM reservations r 
+         JOIN users u ON r.volunteer_id = u.id 
+         WHERE r.user_id = ?
+         ORDER BY r.date DESC, r.time DESC`,
+        [userId]
+      );
+      
+      console.log(`Encontradas ${rows.length} reservas para el usuario ${userId}`);
+      return rows;
+    } catch (error) {
+      console.error('Error al obtener las reservas del usuario:', error);
+      throw error;
+    }
   }
 
   static async getByVolunteerId(volunteerId) {
-    const [rows] = await db.execute(
-      `SELECT r.*, u.username as user_name 
-       FROM reservations r 
-       JOIN users u ON r.user_id = u.id 
-       WHERE r.volunteer_id = ?
-       ORDER BY r.date DESC, r.time DESC`,
-      [volunteerId]
-    );
-    return rows;
+    try {
+      console.log(`Buscando reservas para el voluntario con ID: ${volunteerId}`);
+      
+      // Consulta modificada para no depender de help_request_id
+      const [rows] = await pool.execute(
+        `SELECT r.*, u.username as user_name 
+         FROM reservations r 
+         JOIN users u ON r.user_id = u.id 
+         WHERE r.volunteer_id = ?
+         ORDER BY r.date DESC, r.time DESC`,
+        [volunteerId]
+      );
+      
+      console.log(`Encontradas ${rows.length} reservas para el voluntario ${volunteerId}`);
+      return rows;
+    } catch (error) {
+      console.error('Error al obtener las reservas del voluntario:', error);
+      throw error;
+    }
   }
 
   static async updateStatus(id, status) {
-    await db.execute(
-      'UPDATE reservations SET status = ? WHERE id = ?',
-      [status, id]
-    );
-  }
-
-  static async findById(id) {
-    const [rows] = await db.execute('SELECT * FROM reservations WHERE id = ?', [id]);
-    return rows[0];
+    try {
+      const [result] = await pool.execute(
+        'UPDATE reservations SET status = ? WHERE id = ?',
+        [status, id]
+      );
+      return result.affectedRows > 0;
+    } catch (error) {
+      console.error('Error al actualizar el estado de la reserva:', error);
+      throw error;
+    }
   }
 }
 

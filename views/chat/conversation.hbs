@@ -1,0 +1,200 @@
+{{!-- {{> header}} --}}
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            {{#if contact.profile_image}}
+              <img src="{{contact.profile_image}}" alt="{{contact.username}}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+            {{else}}
+              <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                <i class="fas fa-user text-secondary"></i>
+              </div>
+            {{/if}}
+            <div>
+              <h2 class="h5 mb-0">{{contact.username}}</h2>
+              <small class="text-white-50">
+                {{#if (eq contact.role "blind")}}
+                  Usuario
+                {{else}}
+                  Voluntario
+                {{/if}}
+              </small>
+            </div>
+          </div>
+          <div>
+            {{#if (eq user.role "blind")}}
+              {{#if (eq contact.role "volunteer")}}
+                <a href="/users/volunteers/{{contact.id}}" class="btn btn-sm btn-light me-2">
+                  <i class="fas fa-user"></i> Ver Perfil
+                </a>
+              {{/if}}
+            {{/if}}
+            <a href="/chat" class="btn btn-sm btn-light">
+              <i class="fas fa-arrow-left"></i> Volver
+            </a>
+          </div>
+        </div>
+        
+        <div class="card-body" style="height: 400px; overflow-y: auto;" id="chat-messages">
+          {{#if messages.length}}
+            {{#each messages}}
+              <div class="mb-3 {{#if (eq this.sender_id ../user.id)}}text-end{{/if}}">
+                <div class="d-inline-block p-3 rounded-3 {{#if (eq this.sender_id ../user.id)}}bg-primary text-white{{else}}bg-light{{/if}}" style="max-width: 75%;">
+                  <p class="mb-0">{{this.content}}</p>
+                </div>
+                <div class="text-muted small mt-1">
+                  {{formatTime this.created_at}}
+                </div>
+              </div>
+            {{/each}}
+          {{else}}
+            <div class="text-center text-muted my-5">
+              <i class="fas fa-comments fa-3x mb-3"></i>
+              <p>No hay mensajes aún. ¡Envía el primero!</p>
+            </div>
+          {{/if}}
+        </div>
+        
+        <div class="card-footer">
+          <form action="/chat/send" method="POST">
+            <input type="hidden" name="receiver_id" value="{{contact.id}}">
+            <div class="input-group">
+              <input type="text" name="content" class="form-control" placeholder="Escribe tu mensaje..." required autofocus>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> Enviar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      {{#if (eq user.role "volunteer")}}
+        {{#if (eq contact.role "blind")}}
+          <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+              <h3 class="h5 mb-0">Acciones Rápidas</h3>
+            </div>
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+                  <i class="fas fa-calendar-alt"></i> Programar Asistencia
+                </button>
+                <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#resourcesModal">
+                  <i class="fas fa-book"></i> Compartir Recursos
+                </button>
+              </div>
+            </div>
+          </div>
+        {{/if}}
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<!-- Modal para programar asistencia -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="scheduleModalLabel">Programar Asistencia</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/help-requests/schedule" method="POST">
+        <div class="modal-body">
+          <input type="hidden" name="user_id" value="{{contact.id}}">
+          
+          <div class="mb-3">
+            <label for="schedule_date" class="form-label">Fecha:</label>
+            <input type="date" class="form-control" id="schedule_date" name="schedule_date" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="schedule_time" class="form-label">Hora:</label>
+            <input type="time" class="form-control" id="schedule_time" name="schedule_time" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="schedule_notes" class="form-label">Notas:</label>
+            <textarea class="form-control" id="schedule_notes" name="schedule_notes" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Programar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para compartir recursos -->
+<div class="modal fade" id="resourcesModal" tabindex="-1" aria-labelledby="resourcesModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="resourcesModalLabel">Compartir Recursos</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Recursos Útiles</label>
+          <div class="list-group">
+            <button type="button" class="list-group-item list-group-item-action" onclick="sendResource('Guía de Accesibilidad', 'https://www.example.com/accesibilidad')">
+              Guía de Accesibilidad
+            </button>
+            <button type="button" class="list-group-item list-group-item-action" onclick="sendResource('Tutoriales de Lectores de Pantalla', 'https://www.example.com/lectores')">
+              Tutoriales de Lectores de Pantalla
+            </button>
+            <button type="button" class="list-group-item list-group-item-action" onclick="sendResource('Aplicaciones Recomendadas', 'https://www.example.com/apps')">
+              Aplicaciones Recomendadas
+            </button>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="custom_resource" class="form-label">Recurso Personalizado:</label>
+          <input type="text" class="form-control mb-2" id="resource_title" placeholder="Título del recurso">
+          <input type="text" class="form-control" id="resource_url" placeholder="URL del recurso">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" onclick="sendCustomResource()">Compartir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Hacer scroll al final de los mensajes
+  document.addEventListener('DOMContentLoaded', function() {
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+  
+  // Función para enviar un recurso predefinido
+  function sendResource(title, url) {
+    const message = `Te comparto este recurso: ${title} - ${url}`;
+    document.querySelector('input[name="content"]').value = message;
+    document.querySelector('form').submit();
+  }
+  
+  // Función para enviar un recurso personalizado
+  function sendCustomResource() {
+    const title = document.getElementById('resource_title').value;
+    const url = document.getElementById('resource_url').value;
+    
+    if (title && url) {
+      const message = `Te comparto este recurso: ${title} - ${url}`;
+      document.querySelector('input[name="content"]').value = message;
+      document.querySelector('form').submit();
+    } else {
+      alert('Por favor, completa el título y la URL del recurso.');
+    }
+  }
+</script>
+
+{{!-- {{> footer}} --}}

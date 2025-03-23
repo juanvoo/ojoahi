@@ -1,0 +1,74 @@
+{{!-- {{> header}} --}}
+
+<div class="container mt-4">
+  <h1>Mis Conversaciones</h1>
+  
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h2 class="h5 mb-0">Chats</h2>
+          <a href="/users/dashboard" class="btn btn-sm btn-light">
+            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+          </a>
+        </div>
+        <div class="card-body p-0">
+          {{#if conversations.length}}
+            <div class="list-group list-group-flush">
+              {{#each conversations}}
+                <a href="/chat/{{this.id}}" class="list-group-item list-group-item-action d-flex align-items-center p-3">
+                  <div class="position-relative me-3">
+                    {{#if this.profile_image}}
+                      <img src="{{this.profile_image}}" alt="{{this.username}}" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                    {{else}}
+                      <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="fas fa-user fa-lg text-secondary"></i>
+                      </div>
+                    {{/if}}
+                    
+                    {{#if this.unread_count}}
+                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{this.unread_count}}
+                      </span>
+                    {{/if}}
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h5 class="mb-0">
+                        {{this.username}}
+                        {{#if (eq this.role "blind")}}
+                          <span class="badge bg-info ms-1">Usuario</span>
+                        {{else}}
+                          <span class="badge bg-success ms-1">Voluntario</span>
+                        {{/if}}
+                      </h5>
+                      <small class="text-muted">{{formatTimeAgo this.last_message_time}}</small>
+                    </div>
+                    <p class="mb-0 text-truncate" style="max-width: 500px;">
+                      {{this.last_message}}
+                    </p>
+                  </div>
+                </a>
+              {{/each}}
+            </div>
+          {{else}}
+            <div class="p-4 text-center">
+              <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+              <p>No tienes conversaciones activas.</p>
+              
+              {{#if (eq user.role "blind")}}
+                <p>Puedes iniciar una conversación desde el perfil de un voluntario.</p>
+                <a href="/users/volunteers" class="btn btn-primary">Explorar Voluntarios</a>
+              {{else}}
+                <p>Los usuarios ciegos pueden iniciar conversaciones contigo cuando necesiten ayuda.</p>
+                <a href="/users/dashboard" class="btn btn-primary">Volver al Dashboard</a>
+              {{/if}}
+            </div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- {{> footer}} --}}

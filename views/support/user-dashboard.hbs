@@ -1,0 +1,109 @@
+{{!-- {{> header}} --}}
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Mis Consultas de Soporte</h1>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newChatModal">
+          <i class="fas fa-plus"></i> Nueva Consulta
+        </button>
+      </div>
+      
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h2 class="h5 mb-0">Historial de Consultas</h2>
+        </div>
+        <div class="card-body p-0">
+          {{#if sessions.length}}
+            <div class="list-group list-group-flush">
+              {{#each sessions}}
+                <a href="/support/chat/{{this.id}}" class="list-group-item list-group-item-action d-flex align-items-center p-3">
+                  <div class="position-relative me-3">
+                    {{#if this.agent_username}}
+                      <div class="rounded-circle bg-success d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="fas fa-headset fa-lg text-white"></i>
+                      </div>
+                    {{else}}
+                      <div class="rounded-circle bg-warning d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="fas fa-clock fa-lg text-white"></i>
+                      </div>
+                    {{/if}}
+                    
+                    {{#if this.unread_count}}
+                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{this.unread_count}}
+                      </span>
+                    {{/if}}
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h5 class="mb-0">{{this.subject}}</h5>
+                      <div>
+                        <span class="badge bg-{{#if (eq this.status 'waiting')}}warning{{else if (eq this.status 'active')}}success{{else}}secondary{{/if}}">
+                          {{#if (eq this.status 'waiting')}}En espera{{else if (eq this.status 'active')}}Activo{{else}}Cerrado{{/if}}
+                        </span>
+                        <small class="text-muted ms-2">{{formatDate this.updated_at}}</small>
+                      </div>
+                    </div>
+                    <p class="mb-0">
+                      {{#if this.agent_username}}
+                        Atendido por: {{this.agent_username}}
+                      {{else}}
+                        Esperando asignación de agente
+                      {{/if}}
+                    </p>
+                  </div>
+                </a>
+              {{/each}}
+            </div>
+          {{else}}
+            <div class="p-4 text-center">
+              <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+              <p>No tienes consultas de soporte activas.</p>
+              <p>Puedes iniciar una nueva consulta haciendo clic en el botón "Nueva Consulta".</p>
+            </div>
+          {{/if}}
+        </div>
+      </div>
+      
+      <div class="mt-4">
+        <a href="/support/help" class="btn btn-outline-primary">
+          <i class="fas fa-question-circle"></i> Centro de Ayuda
+        </a>
+        <a href="/users/dashboard" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left"></i> V  class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left"></i> Volver al Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para nueva consulta -->
+<div class="modal fade" id="newChatModal" tabindex="-1" aria-labelledby="newChatModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newChatModalLabel">Nueva Consulta de Soporte</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/support/create" method="POST">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="subject" class="form-label">Asunto</label>
+            <input type="text" class="form-control" id="subject" name="subject" placeholder="Ej: Problema con mi cuenta" required>
+            <div class="form-text">Describe brevemente tu consulta para que podamos ayudarte mejor.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Iniciar Chat</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{!-- {{> footer}} --}}
+

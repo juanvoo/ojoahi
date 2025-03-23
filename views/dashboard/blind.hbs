@@ -1,0 +1,190 @@
+{{!-- <link rel="stylesheet" href="/css/dashblind.css">
+<link rel="stylesheet" href="/css/delete.css">
+  <div class="blind">
+<h1 style="background-color: #0d0d0dff; color:#00f8b6ff">Bienvenido, {{user.username}}!</h1>
+<br>
+
+<div class="dashboard-options">
+  <h2 style="color: white;">{{__ 'MakeReservation'}}</h2>
+  <a href="/volunteerList" class="btn" style="color: white;">Ver lista de voluntarios y solicitar asistencia</a>
+<br>
+<br>
+<section>
+  <h2 style="color: white;">Crear una Nueva Reseña</h2>
+  <a href="/reviews/create" class="btn" style="border-radius: 5px; background-color:#00f8b6ff">Crear Nueva Reseña</a>
+</section>
+<br>
+<br>
+<section>
+  <h2 style="color: white;">{{__ 'YourReservations'}}</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>{{__ 'Date'}}</th>
+        <th>{{__ 'Time'}}</th>
+        <th>{{__ 'Volunteer'}}</th>
+        <th>{{__ 'Status'}}</th>
+        <th>{{__ 'Actions'}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each reservations}}
+        <tr>
+          <td>{{formatDate this.date}}</td>
+          <td>{{this.time}}</td>
+          <td>{{this.volunteer_name}}</td>
+          <td>{{__ this.status}}</td>
+          <td>
+            {{#if (eq this.status 'pending')}}
+              <form action="/reservations/cancel/{{this.id}}" method="POST">
+                <button type="submit">{{__ 'Cancel'}}</button>
+              </form>
+            {{/if}}
+            {{#if (eq this.status 'completed')}}
+              <a href="/reviews/create/{{this.id}}">{{__ 'LeaveReview'}}</a>
+            {{/if}}
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</section>
+
+</div>
+<div class="delete-account-section">
+  <h2>Eliminar cuenta</h2>
+  <p>¡Atención! Esta acción es irreversible y eliminará permanentemente tu cuenta y todos tus datos asociados.</p>
+  <form action="/users/delete-account" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.');">
+    <button type="submit" class="btn btn-danger">Eliminar mi cuenta</button>
+  </form>
+</div>
+</div> --}}
+
+
+
+<h1>Bienvenido, {{user.username}}!</h1>
+
+{{#if notifications.length}}
+  <div class="alert alert-info">
+    <h4>Notificaciones</h4>
+    <ul>
+      {{#each notifications}}
+        <li>
+          <strong>{{this.title}}</strong>: {{this.message}}
+          <small class="text-muted">{{formatDate this.created_at}}</small>
+        </li>
+      {{/each}}
+    </ul>
+    <a href="/notifications/mark-all-read" class="btn btn-sm btn-primary">Marcar todas como leídas</a>
+  </div>
+{{/if}}
+
+<div class="mb-4">
+  <a href="/help-requests/create" class="btn btn-primary">Solicitar Ayuda</a>
+  <a href="/reservations/create" class="btn btn-primary">Crear Reserva</a>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header bg-primary text-white">
+    <h3 class="h5 mb-0">Acciones Rápidas</h3>
+  </div>
+  <div class="card-body">
+    <div class="d-grid gap-2">
+      <a href="/users/volunteers" class="btn btn-primary">
+        <i class="fas fa-users"></i> Explorar Voluntarios
+      </a>
+      <a href="/help-requests/new" class="btn btn-success">
+        <i class="fas fa-hands-helping"></i> Nueva Solicitud de Ayuda
+      </a>
+      <a href="/chat" class="btn btn-info">
+        <i class="fas fa-comments"></i> Mis Conversaciones
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="mb-3">
+  <a href="/chat" class="btn btn-info">
+    <i class="fas fa-comments"></i> Mis Mensajes
+    {{#if unreadMessages}}
+      <span class="badge bg-danger">{{unreadMessages}}</span>
+    {{/if}}
+  </a>
+</div>
+
+<h2>Tus Reservas</h2>
+{{#if reservations.length}}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Voluntario</th>
+        <th>Descripción</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each reservations}}
+        <tr>
+          <td>{{formatDate this.date}}</td>
+          <td>{{this.time}}</td>
+          <td>
+            <a href="/reviews/volunteer/{{this.volunteer_id}}">{{this.volunteer_name}}</a>
+          </td>
+          <td>{{this.description}}</td>
+          <td>{{this.status}}</td>
+          <td>
+            {{#if (eq this.status "completed")}}
+              <a href="/reviews/create/{{this.id}}" class="btn btn-primary">Dejar Reseña</a>
+            {{/if}}
+            {{#if (eq this.status "pending")}}
+              <a href="/reservations/cancel/{{this.id}}" class="btn btn-danger">Cancelar</a>
+            {{/if}}
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{else}}
+  <p>No tienes reservas</p>
+{{/if}}
+
+<div class="mb-4">
+  <a href="/reviews/create" class="btn btn-primary">Dejar Reseña a un Voluntario</a>
+</div>
+
+<h2>Tus Reseñas</h2>
+{{#if reviews.length}}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Voluntario</th>
+        <th>Calificación</th>
+        <th>Comentario</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each reviews}}
+        <tr>
+          <td>{{this.volunteer_name}}</td>
+          <td>{{this.rating}}/5</td>
+          <td>{{this.comment}}</td>
+          <td>{{formatDate this.created_at}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{else}}
+  <p>Aún no has dejado reseñas</p>
+{{/if}}
+
+<div class="alert alert-danger mt-5">
+  <h3>Eliminar cuenta</h3>
+  <p>¡Atención! Esta acción es irreversible y eliminará permanentemente tu cuenta y todos tus datos asociados.</p>
+  <form action="/users/delete-account" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.')">
+    <button type="submit" class="btn btn-danger">Eliminar mi cuenta</button>
+  </form>
+</div>

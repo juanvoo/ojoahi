@@ -1,23 +1,27 @@
-const db = require('../config/database');
 const pool = require('../config/database');
 const bcrypt = require('bcryptjs');
 
 class User {
-  static async findAll() {
-    const [rows] = await db.execute('SELECT * FROM users');
-    return rows;
-  }
-
-  static async findById(id) {
-    const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [id]);
-    return rows[0];
+  static async create({ username, email, password, role, user_type }) {
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const [result] = await pool.execute(
+        'INSERT INTO users (username, email, password, role, user_type) VALUES (?, ?, ?, ?, ?)',
+        [username, email, hashedPassword, role, user_type || role]
+      );
+      return result.insertId;
+    } catch (error) {
+      console.error('Error al crear usuario:', error);
+      throw error;
+    }
   }
 
   static async findByEmail(email) {
     try {
-      console.log('Buscando usuario por email:', email);
-      const [rows] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
-      console.log('Resultado de la búsqueda:', rows[0] ? 'Usuario encontrado' : 'Usuario no encontrado');
+      const [rows] = await pool.execute(
+        'SELECT * FROM users WHERE email = ?',
+        [email]
+      );
       return rows[0];
     } catch (error) {
       console.error('Error al buscar usuario por email:', error);
@@ -25,116 +29,233 @@ class User {
     }
   }
 
-  static async create(userData) {
-    const { username, email, password, user_type } = userData;
+  static async findById(id) {
     try {
-      console.log('Intentando crear usuario:', { username, email, user_type });
-      const [result] = await db.execute(
-        'INSERT INTO users (username, email, password, user_type) VALUES (?, ?, ?, ?)',
-        [username, email, password, user_type]
+      const [rows] = await pool.execute(
+        `SELECT id, username, email, password, role, 
+                IFNULL(phone, '') as phone, 
+                IFNULL(address, '') as address,
+                IFNULL(profile_image, '') as profile_image,
+                created_at
+         FROM users 
+         WHERE id = ?`,
+        [id]
       );
-      console.log('Usuario creado con ID:', result.insertId);
-      return { id: result.insertId, username, email, user_type };
+      
+      if (rows.length === 0) {
+        return null;
+      }
+      
+      // Añadir propiedades vacías para los campos que podrían no existir
+      const user = rows[0];
+      user.name = user.name || '';
+      user.bio = user.bio || '';
+      user.availability = user.availability || '';
+      user.updated_at = user.updated_at || user.created_at;
+      
+      return user;
     } catch (error) {
-      console.error('Error detallado al crear usuario:', error);
+      console.error('Error al buscar usuario por ID:', error);
       throw error;
     }
-  }
-
-  static async update(id, userData) {
-    const { username, email, user_type } = userData;
-    await db.execute(
-      'UPDATE users SET username = ?, email = ?, user_type = ? WHERE id = ?',
-      [username, email, user_type, id]
-    );
-    return this.findById(id);
-  }
-
-  static async deleteById(id) {
-    const connection = await pool.getConnection();
-    try {
-      await connection.beginTransaction();
-
-      // Primero, actualizar las solicitudes de ayuda para este voluntario
-      await connection.execute('UPDATE help_requests SET volunteer_id = NULL WHERE volunteer_id = ?', [id]);
-
-      // Luego, eliminar las solicitudes de ayuda creadas por este usuario
-      await connection.execute('DELETE FROM help_requests WHERE user_id = ?', [id]);
-
-      // Finalmente, eliminar el usuario
-      const [result] = await connection.execute('DELETE FROM users WHERE id = ?', [id]);
-
-      await connection.commit();
-      return result.affectedRows > 0;
-    } catch (error) {
-      await connection.rollback();
-      console.error('Error al eliminar usuario:', error);
-      throw error;
-    } finally {
-      connection.release();
-    }
-  }
-
-
-  static async getAllVolunteers() {
-    const [rows] = await db.execute('SELECT id, username, email FROM users WHERE user_type = ?', ['volunteer']);
-    return rows;
-  }
-
-  static async getReservationsForUser(userId) {
-    const [rows] = await pool.execute(
-      'SELECT r.*, u.name as volunteer_name FROM reservations r LEFT JOIN users u ON r.volunteer_id = u.id WHERE r.user_id = ? ORDER BY r.date DESC',
-      [userId]
-    );
-    return rows;
-  }
-
-  static async getReservationsForVolunteer(userId) {
-    const [rows] = await pool.execute(
-      'SELECT r.*, u.name as user_name FROM reservations r LEFT JOIN users u ON r.user_id = u.id WHERE r.volunteer_id = ? ORDER BY r.date DESC',
-      [userId]
-    );
-    return rows;
-  }
-
-  static async getVolunteerReviews() {
-    const [rows] = await pool.execute(`
-      SELECT r.*, u.name as volunteer_name, b.name as blind_user_name
-      FROM reviews r
-      JOIN users u ON r.volunteer_id = u.id
-      JOIN users b ON r.user_id = b.id
-      ORDER BY r.created_at DESC
-    `);
-    return rows;
-  }
-
-  static async getPendingHelpRequests() {
-    const [rows] = await pool.execute(
-      'SELECT hr.*, u.name as blind_user_name FROM help_requests hr JOIN users u ON hr.user_id = u.id WHERE hr.status = "pending" ORDER BY hr.created_at DESC'
-    );
-    return rows;
-  }
-
-  static async getCompletedReservationsForUser(userId) {
-    const [rows] = await pool.execute(`
-      SELECT r.*, u.name as volunteer_name, 
-      (SELECT COUNT(*) FROM reviews WHERE reservation_id = r.id) as has_review
-      FROM reservations r 
-      JOIN users u ON r.volunteer_id = u.id 
-      WHERE r.user_id = ? AND r.status = 'completed'
-      ORDER BY r.date DESC
-    `, [userId]);
-    return rows;
   }
 
   static async getVolunteers() {
     try {
       const [rows] = await pool.execute(
-        'SELECT id, username FROM users WHERE role = "volunteer"'
+        'SELECT id, username FROM users WHERE role = ?',
+        ['volunteer']
       );
       return rows;
     } catch (error) {
       console.error('Error al obtener voluntarios:', error);
+      throw error;
+    }
+  }
+
+  static async deleteUser(id) {
+    try {
+      const [result] = await pool.execute(
+        'DELETE FROM users WHERE id = ?',
+        [id]
+      );
+      return result.affectedRows > 0;
+    } catch (error) {
+      console.error('Error al eliminar usuario:', error);
+      throw error;
+    }
+  }
+
+  static async updateProfile(userId, userData) {
+    try {
+      const { username, name, email, phone, address, bio, availability } = userData;
+      
+      // Verificar si el email o username ya están en uso por otro usuario
+      if (email) {
+        const [emailCheck] = await pool.execute(
+          'SELECT id FROM users WHERE email = ? AND id != ?',
+          [email, userId]
+        );
+        
+        if (emailCheck.length > 0) {
+          throw new Error('El email ya está en uso por otro usuario');
+        }
+      }
+      
+      if (username) {
+        const [usernameCheck] = await pool.execute(
+          'SELECT id FROM users WHERE username = ? AND id != ?',
+          [username, userId]
+        );
+        
+        if (usernameCheck.length > 0) {
+          throw new Error('El nombre de usuario ya está en uso');
+        }
+      }
+      
+      // Obtener las columnas disponibles
+      const [columns] = await pool.execute('SHOW COLUMNS FROM users');
+      const columnNames = columns.map(col => col.Field);
+      
+      // Construir la consulta SQL dinámicamente
+      let sql = 'UPDATE users SET ';
+      const updateFields = [];
+      const params = [];
+      
+      // Solo incluir campos que existen en la tabla
+      if (username && columnNames.includes('username')) {
+        updateFields.push('username = ?');
+        params.push(username);
+      }
+      
+      if (name && columnNames.includes('name')) {
+        updateFields.push('name = ?');
+        params.push(name);
+      }
+      
+      if (email && columnNames.includes('email')) {
+        updateFields.push('email = ?');
+        params.push(email);
+      }
+      
+      if (columnNames.includes('phone')) {
+        updateFields.push('phone = ?');
+        params.push(phone || '');
+      }
+      
+      if (columnNames.includes('address')) {
+        updateFields.push('address = ?');
+        params.push(address || '');
+      }
+      
+      if (bio && columnNames.includes('bio')) {
+        updateFields.push('bio = ?');
+        params.push(bio);
+      }
+      
+      if (availability && columnNames.includes('availability')) {
+        updateFields.push('availability = ?');
+        params.push(availability);
+      }
+      
+      // Si no hay campos para actualizar, devolver el usuario actual
+      if (updateFields.length === 0) {
+        return await this.findById(userId);
+      }
+      
+      // Añadir la fecha de actualización si existe
+      if (columnNames.includes('updated_at')) {
+        updateFields.push('updated_at = NOW()');
+      }
+      
+      sql += updateFields.join(', ');
+      sql += ' WHERE id = ?';
+      params.push(userId);
+      
+      console.log('SQL de actualización:', sql);
+      console.log('Parámetros:', params);
+      
+      const [result] = await pool.execute(sql, params);
+      
+      console.log(`Perfil actualizado para el usuario ${userId}. Filas afectadas: ${result.affectedRows}`);
+      
+      // Obtener y devolver el usuario actualizado
+      return await this.findById(userId);
+    } catch (error) {
+      console.error('Error al actualizar el perfil:', error);
+      throw error;
+    }
+  }
+  
+  static async updateProfileImage(userId, imagePath) {
+    try {
+      const [result] = await pool.execute(
+        'UPDATE users SET profile_image = ?, updated_at = NOW() WHERE id = ?',
+        [imagePath, userId]
+      );
+      
+      console.log(`Imagen de perfil actualizada para el usuario ${userId}. Filas afectadas: ${result.affectedRows}`);
+      
+      // Obtener y devolver el usuario actualizado
+      return await this.findById(userId);
+    } catch (error) {
+      console.error('Error al actualizar la imagen de perfil:', error);
+      throw error;
+    }
+  }
+  
+  static async changePassword(userId, currentPassword, newPassword) {
+    try {
+      // Obtener el usuario actual
+      const user = await this.findById(userId);
+      if (!user) {
+        throw new Error('Usuario no encontrado');
+      }
+      
+      // Verificar la contraseña actual
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        throw new Error('La contraseña actual es incorrecta');
+      }
+      
+      // Encriptar la nueva contraseña
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+      
+      // Actualizar la contraseña
+      await pool.execute(
+        'UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?',
+        [hashedPassword, userId]
+      );
+      
+      return true;
+    } catch (error) {
+      console.error('Error al cambiar la contraseña:', error);
+      throw error;
+    }
+  }
+  
+  static async getStats(userId) {
+    try {
+      // Obtener el total de reservas completadas
+      const [reservations] = await pool.execute(
+        'SELECT COUNT(*) as total FROM reservations WHERE volunteer_id = ? AND status = "completed"',
+        [userId]
+      );
+      
+      // Obtener la calificación promedio y total de reseñas
+      const [reviews] = await pool.execute(
+        'SELECT COUNT(*) as total, AVG(rating) as average FROM reviews WHERE volunteer_id = ?',
+        [userId]
+      );
+      
+      return {
+        totalReservations: reservations[0].total || 0,
+        totalReviews: reviews[0].total || 0,
+        averageRating: reviews[0].average ? parseFloat(reviews[0].average).toFixed(1) : '0.0'
+      };
+    } catch (error) {
+      console.error('Error al obtener estadísticas del usuario:', error);
       throw error;
     }
   }

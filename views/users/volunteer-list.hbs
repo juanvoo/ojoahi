@@ -1,0 +1,107 @@
+{{!-- {{> header}} --}}
+
+<div class="container mt-4">
+  <h1>Voluntarios Disponibles</h1>
+  
+  <div class="row mb-4">
+    <div class="col">
+      <div class="input-group">
+        <input type="text" id="searchVolunteer" class="form-control" placeholder="Buscar por nombre o disponibilidad...">
+        <button class="btn btn-primary" type="button" id="searchBtn">Buscar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" id="volunteersList">
+    {{#if volunteers.length}}
+      {{#each volunteers}}
+        <div class="col-md-4 mb-4 volunteer-card">
+          <div class="card h-100">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">{{this.username}}</h5>
+              <div>
+                <span class="badge bg-light text-dark">
+                  {{#if this.average_rating}}
+                    {{formatNumber this.average_rating 1}} ★
+                  {{else}}
+                    Sin calificaciones
+                  {{/if}}
+                </span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="text-center mb-3">
+                {{#if this.profile_image}}
+                  <img src="{{this.profile_image}}" alt="Foto de {{this.username}}" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                {{else}}
+                  <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto" style="width: 100px; height: 100px;">
+                    <i class="fas fa-user fa-3x text-secondary"></i>
+                  </div>
+                {{/if}}
+              </div>
+              
+              {{#if this.bio}}
+                <p class="card-text text-truncate">{{this.bio}}</p>
+              {{else}}
+                <p class="card-text text-muted">Sin biografía</p>
+              {{/if}}
+              
+              <h6 class="mt-3">Disponibilidad:</h6>
+              {{#if this.availability}}
+                <p class="card-text">{{this.availability}}</p>
+              {{else}}
+                <p class="card-text text-muted">No especificada</p>
+              {{/if}}
+              
+              <div class="mt-3">
+                <span class="text-muted">{{this.total_reviews}} reseñas</span>
+              </div>
+            </div>
+            <div class="card-footer">
+              <a href="/users/volunteers/{{this.id}}" class="btn btn-primary w-100">Ver Perfil</a>
+            </div>
+          </div>
+        </div>
+      {{/each}}
+    {{else}}
+      <div class="col-12">
+        <div class="alert alert-info">
+          No hay voluntarios disponibles en este momento.
+        </div>
+      </div>
+    {{/if}}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchVolunteer');
+    const searchBtn = document.getElementById('searchBtn');
+    const volunteerCards = document.querySelectorAll('.volunteer-card');
+    
+    function filterVolunteers() {
+      const searchTerm = searchInput.value.toLowerCase();
+      
+      volunteerCards.forEach(card => {
+        const username = card.querySelector('.card-header h5').textContent.toLowerCase();
+        const bio = card.querySelector('.card-body p').textContent.toLowerCase();
+        const availability = card.querySelectorAll('.card-body p')[2]?.textContent.toLowerCase() || '';
+        
+        if (username.includes(searchTerm) || bio.includes(searchTerm) || availability.includes(searchTerm)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+    
+    searchBtn.addEventListener('click', filterVolunteers);
+    searchInput.addEventListener('keyup', function(e) {
+      if (e.key === 'Enter') {
+        filterVolunteers();
+      }
+    });
+  });
+</script>
+
+{{!-- {{> footer}} --}}

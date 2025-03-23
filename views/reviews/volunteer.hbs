@@ -1,0 +1,67 @@
+<h1>Reseñas de {{volunteer.username}}</h1>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <h2>Calificación Promedio: 
+      <span class="text-warning">
+        {{#if averageRating}}
+          {{#times 5}}
+            {{#if (lte this averageRating)}}
+              <span class="star filled">★</span>
+            {{else}}
+              <span class="star">★</span>
+            {{/if}}
+          {{/times}}
+          ({{averageRating}}/5)
+        {{else}}
+          Sin calificaciones
+        {{/if}}
+      </span>
+    </h2>
+    <p>Total de reseñas: {{totalReviews}}</p>
+  </div>
+</div>
+
+{{#if reviews.length}}
+  <div class="reviews">
+    {{#each reviews}}
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="card-title">{{this.user_name}}</h5>
+            <div class="rating">
+              {{#times 5}}
+                {{#if (lte this ../rating)}}
+                  <span class="star filled">★</span>
+                {{else}}
+                  <span class="star">★</span>
+                {{/if}}
+              {{/times}}
+            </div>
+          </div>
+          <p class="card-text">{{this.comment}}</p>
+          <small class="text-muted">{{formatDate this.created_at}}</small>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+{{else}}
+  <p>Este voluntario aún no tiene reseñas.</p>
+{{/if}}
+
+<a href="/users/dashboard" class="btn btn-primary">Volver al Dashboard</a>
+
+<style>
+  .star {
+    color: #ddd;
+    font-size: 1.5rem;
+  }
+  
+  .star.filled {
+    color: #ffc107;
+  }
+  
+  .rating {
+    display: inline-block;
+  }
+</style>

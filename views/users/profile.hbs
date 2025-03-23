@@ -1,0 +1,165 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h2>Mi Perfil</h2>
+        </div>
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-md-4 text-center">
+              <div class="avatar-container mb-3">
+                {{#if user.profile_image}}
+                  <img src="{{user.profile_image}}" alt="Foto de perfil" class="img-fluid rounded-circle profile-image">
+                {{else}}
+                  <div class="default-avatar">
+                    <i class="fas fa-user fa-5x"></i>
+                  </div>
+                {{/if}}
+              </div>
+              <h4>{{user.username}}</h4>
+              <p class="badge bg-{{#if (eq user.role 'blind')}}info{{else}}success{{/if}}">
+                {{#if (eq user.role 'blind')}}Usuario{{else}}Voluntario{{/if}}
+              </p>
+            </div>
+            <div class="col-md-8">
+              <table class="table">
+                <tr>
+                  <th>Nombre de usuario:</th>
+                  <td>{{user.username}}</td>
+                </tr>
+                {{#if user.name}}
+                <tr>
+                  <th>Nombre completo:</th>
+                  <td>{{user.name}}</td>
+                </tr>
+                {{/if}}
+                <tr>
+                  <th>Email:</th>
+                  <td>{{user.email}}</td>
+                </tr>
+                {{#if user.phone}}
+                <tr>
+                  <th>Teléfono:</th>
+                  <td>{{user.phone}}</td>
+                </tr>
+                {{/if}}
+                {{#if user.address}}
+                <tr>
+                  <th>Dirección:</th>
+                  <td>{{user.address}}</td>
+                </tr>
+                {{/if}}
+                <tr>
+                  <th>Fecha de registro:</th>
+                  <td>{{formatDate user.created_at}}</td>
+                </tr>
+                {{#if (eq user.role 'volunteer')}}
+                  {{#if user.bio}}
+                  <tr>
+                    <th>Biografía:</th>
+                    <td>{{user.bio}}</td>
+                  </tr>
+                  {{/if}}
+                  {{#if user.availability}}
+                  <tr>
+                    <th>Disponibilidad:</th>
+                    <td>{{user.availability}}</td>
+                  </tr>
+                  {{/if}}
+                {{/if}}
+              </table>
+            </div>
+          </div>
+          <div class="text-center">
+            <a href="/users/profile/edit" class="btn btn-primary">Editar Perfil</a>
+            <a href="/users/profile/change-password" class="btn btn-secondary">Cambiar Contraseña</a>
+          </div>
+        </div>
+      </div>
+
+      {{#if (eq user.role 'volunteer')}}
+      <div class="card mt-4">
+        <div class="card-header bg-success text-white">
+          <h3>Estadísticas como Voluntario</h3>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-md-4">
+              <div class="stat-box">
+                <h4>{{totalReservations}}</h4>
+                <p>Reservas Completadas</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="stat-box">
+                <h4>{{averageRating}}/5</h4>
+                <p>Calificación Promedio</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="stat-box">
+                <h4>{{totalReviews}}</h4>
+                <p>Reseñas Recibidas</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+  <div class="text-center">
+  <a href="/users/profile/edit" class="btn btn-primary">Editar Perfil</a>
+  <a href="/users/profile/change-password" class="btn btn-secondary">Cambiar Contraseña</a>
+  <a href="/users/profile?refresh=true" class="btn btn-info">Refrescar Datos</a>
+</div>
+</div>
+
+<style>
+  .avatar-container {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .default-avatar {
+    color: #aaa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .stat-box {
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    margin-bottom: 10px;
+  }
+  
+  .stat-box h4 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .stat-box p {
+    margin: 0;
+    color: #666;
+  }
+</style>

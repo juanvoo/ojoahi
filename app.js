@@ -5,6 +5,10 @@ const { engine } = require('express-handlebars');
 const path = require('path');
 const i18n = require('i18n');
 const Handlebars = require('handlebars');
+const moment = require('moment');
+const fileUpload = require('express-fileupload');
+const fs = require('fs');
+const hbs = require('express-handlebars');
 
 const app = express();
 
@@ -19,25 +23,84 @@ Handlebars.registerHelper('formatDate', function(date) {
 });
 
 // Configuración de Handlebars
-app.engine('.hbs', engine({ 
+app.engine('hbs', engine({
   extname: '.hbs',
   defaultLayout: 'main',
   layoutsDir: path.join(__dirname, 'views/layouts'),
+  partialsDir: path.join(__dirname, 'views/partials'),
   helpers: {
-    eq: function (v1, v2) {
-      return v1 === v2;
+    eq: function(a, b) {
+      return a === b;
+    },
+    lte: function(a, b) {
+      return a <= b;
+    },
+    formatDate: function(date) {
+      return new Date(date).toLocaleDateString();
+    },
+    formatTimeAgo: function(date) {
+      if (!date) return '';
+      
+      const now = new Date();
+      const messageDate = new Date(date);
+      const diffMs = now - messageDate;
+      const diffSec = Math.floor(diffMs / 1000);
+      const diffMin = Math.floor(diffSec / 60);
+      const diffHour = Math.floor(diffMin / 60);
+      const diffDay = Math.floor(diffHour / 24);
+      
+      if (diffDay > 0) {
+        return `${diffDay}d`;
+      } else if (diffHour > 0) {
+        return `${diffHour}h`;
+      } else if (diffMin > 0) {
+        return `${diffMin}m`;
+      } else {
+        return 'ahora';
+      }
+    },
+    formatTime: function(date) {
+      if (!date) return '';
+      
+      const messageDate = new Date(date);
+      return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    },
+
+    times: function(n, block) {
+      let accum = '';
+      for (let i = 0; i < n; ++i) {
+        accum += block.fn(i);
+      }
+      return accum;
+    },
+    
+    // Añadir el helper formatNumber
+    formatNumber: function(number, decimals = 0) {
+      if (number === null || number === undefined) return '0';
+      
+      // Convertir a número si es string
+      const num = parseFloat(number);
+      
+      // Verificar si es un número válido
+      if (isNaN(num)) return '0';
+      
+      // Formatear con el número de decimales especificado
+      return num.toFixed(decimals);
     }
   }
 }));
-app.set('view engine', '.hbs');
+app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Configuración de sesiones
 app.use(session({
-  secret: 'tu_secreto_aqui',
-  resave: false,
-  saveUninitialized: true
+  secret: 'secret',
+  resave: true,
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000 // 1 día
+  }
 }));
 
 // Configuración de flash messages
@@ -46,9 +109,11 @@ app.use(flash());
 // Configuración de i18n
 i18n.configure({
   locales: ['es', 'en'],
-  directory: path.join(__dirname, 'locales'),
   defaultLocale: 'es',
-  cookie: 'lang',
+  directory: path.join(__dirname, 'locales'),
+  objectNotation: true,
+  updateFiles: false,
+  cookie: 'lang'
 });
 app.use(i18n.init);
 
@@ -69,8 +134,8 @@ app.use((req, res, next) => {
 });
 
 // Parseo de body
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Rutas
 const indexRoutes = require('./routes/index');
@@ -80,8 +145,13 @@ const dashboardRoutes = require('./routes/dashboards');
 const creatorsRoutes = require('./routes/creators');
 const aboutRoutes = require('./routes/about');
 const opinionsRoutes = require ('./routes/opinions');
-const helpRoutes = require ('./routes/help');
+// const helpRoutes = require ('./routes/help');
+const helpRequestRoutes = require('./routes/helpRequests');
+const reservationRoutes = require('./routes/reservations');
 const reviewRoutes = require('./routes/reviews');
+const notificationRoutes = require('./routes/notifications');
+const chatRoutes = require('./routes/chat');
+const supportRoutes = require('./routes/support');
 
 app.use('/', indexRoutes);
 app.use('/', authRoutes);
@@ -90,8 +160,12 @@ app.use('/', dashboardRoutes);
 app.use('/', creatorsRoutes);
 app.use('/', aboutRoutes);
 app.use('/', opinionsRoutes);
-app.use('/', helpRoutes);
+// app.use('/', helpRoutes);
 app.use('/reviews', reviewRoutes);
+app.use('/help-requests', helpRequestRoutes);
+app.use('/reservations', reservationRoutes);
+app.use('/notifications', notificationRoutes);
+app.use('/chat', chatRoutes);
 
 // Manejo de errores 404
 app.use((req, res, next) => {
@@ -103,6 +177,33 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).render('500', { title: '500: Error del servidor' });
 });
+
+app.use(fileUpload({
+  limits: { fileSize: 5 * 1024 * 1024 }, // Límite de 5MB
+  createParentPath: true,
+  useTempFiles: true, // Usar archivos temporales para mejorar el rendimiento
+  tempFileDir: '/tmp/', // Directorio para archivos temporales
+  debug: true // Activar modo debug para ver más información
+}));
+
+// Inicializar tablas
+const Message = require('./models/Message');
+Message.createTable().catch(console.error);
+
+// Inicializar tablas
+const Notification = require('./models/Notification');
+Notification.createTable().catch(console.error);
+
+// Inicializar tablas
+const SupportChat = require('./models/SupportChat');
+const FAQ = require('./models/FAQ');
+
+// Crear tablas si no existen
+SupportChat.createTable().catch(console.error);
+FAQ.createTable().catch(console.error);
+
+// Usar rutas de soporte
+app.use('/support', supportRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));

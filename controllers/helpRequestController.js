@@ -1,85 +1,127 @@
-const User = require('../models/User');
 const HelpRequest = require('../models/HelpRequest');
-const pool = require('../config/database');
+const User = require('../models/User');
 
-exports.showRequestForm = async (req, res) => {
+exports.getCreateHelpRequest = async (req, res) => {
   try {
-    const volunteerId = req.params.volunteerId;
-    const volunteer = await User.findById(volunteerId);
+    // Obtener la lista de voluntarios disponibles
+    const volunteers = await User.getVolunteers();
     
-    if (!volunteer || volunteer.user_type !== 'volunteer') {
-      req.flash('error_msg', 'Voluntario no encontrado');
-      return res.redirect('/volunteerList');
-    }
-
-    res.render('request-help', { 
-      title: 'Solicitar Ayuda', 
-      volunteer,
-      user: req.session.user
+    res.render('helpRequests/create', {
+      title: 'Solicitar Ayuda',
+      volunteers
     });
   } catch (error) {
-    console.error(error);
-    req.flash('error_msg', 'Error al cargar el formulario de solicitud');
-    res.redirect('/volunteerList');
+    console.error('Error al cargar la página de solicitud de ayuda:', error);
+    req.flash('error_msg', 'Error al cargar la página');
+    res.redirect('/users/dashboard');
   }
 };
 
-exports.submitRequest = async (req, res) => {
+exports.postCreateHelpRequest = async (req, res) => {
   try {
-    const { volunteerId, description, date, time } = req.body;
-    const userId = req.session.user.id;
-
+    const { volunteer_id, description, date, time } = req.body;
+    const user_id = req.session.user.id;
+    
+    // Validación básica
+    if (!description || !date || !time) {
+      req.flash('error_msg', 'Por favor, completa todos los campos requeridos');
+      return res.redirect('/help-requests/create');
+    }
+    
+    // Crear la solicitud de ayuda
     await HelpRequest.create({
-      user_id: userId,
-      volunteer_id: volunteerId,
+      user_id,
+      volunteer_id: volunteer_id || null,
       description,
       date,
-      time,
-      status: 'pending'
+      time
     });
-
-    req.flash('success_msg', 'Solicitud de ayuda enviada con éxito');
-    res.redirect('/blind-dashboard');
+    
+    req.flash('success_msg', 'Solicitud de ayuda creada exitosamente');
+    res.redirect('/users/dashboard');
   } catch (error) {
-    console.error(error);
-    req.flash('error_msg', 'Error al enviar la solicitud de ayuda');
-    res.redirect('/volunteerList');
+    console.error('Error al crear la solicitud de ayuda:', error);
+    req.flash('error_msg', 'Error al crear la solicitud de ayuda');
+    res.redirect('/help-requests/create');
   }
 };
 
 exports.acceptHelpRequest = async (req, res) => {
   try {
-    const requestId = req.params.id;
+    const helpRequestId = req.params.id;
     const volunteerId = req.session.user.id;
-
-    await pool.execute(
-      'UPDATE help_requests SET status = "accepted", volunteer_id = ? WHERE id = ?',
-      [volunteerId, requestId]
-    );
-
-    req.flash('success_msg', 'Has aceptado la solicitud de ayuda');
-    res.redirect('/users/volunteer-dashboard');
+    
+    // Obtener la solicitud de ayuda
+    const helpRequest = await HelpRequest.getById(helpRequestId);
+    if (!helpRequest) {
+      req.flash('error_msg', 'Solicitud de ayuda no encontrada');
+      return res.redirect('/users/dashboard');
+    }
+    
+    // Actualizar el estado de la solicitud
+    await HelpRequest.updateStatus(helpRequestId, 'accepted', volunteerId);
+    
+    // Crear notificación para el usuario ciego
+    const Notification = require('../models/Notification');
+    await Notification.create({
+      user_id: helpRequest.user_id,
+      title: 'Solicitud de ayuda aceptada',
+      message: `Tu solicitud de ayuda para el ${new Date(helpRequest.date).toLocaleDateString()} a las ${helpRequest.time} ha sido aceptada por ${req.session.user.username}.`,
+      type: 'help_request_accepted'
+    });
+    
+    req.flash('success_msg', 'Solicitud de ayuda aceptada exitosamente');
+    res.redirect('/users/dashboard');
   } catch (error) {
     console.error('Error al aceptar la solicitud de ayuda:', error);
-    req.flash('error_msg', 'Hubo un error al aceptar la solicitud');
-    res.redirect('/users/volunteer-dashboard');
+    req.flash('error_msg', 'Error al aceptar la solicitud de ayuda');
+    res.redirect('/users/dashboard');
   }
 };
 
 exports.rejectHelpRequest = async (req, res) => {
   try {
-    const requestId = req.params.id;
-
-    await pool.execute(
-      'UPDATE help_requests SET status = "rejected" WHERE id = ?',
-      [requestId]
-    );
-
-    req.flash('success_msg', 'Has rechazado la solicitud de ayuda');
-    res.redirect('/users/volunteer-dashboard');
+    const helpRequestId = req.params.id;
+    
+    // Obtener la solicitud de ayuda
+    const helpRequest = await HelpRequest.getById(helpRequestId);
+    if (!helpRequest) {
+      req.flash('error_msg', 'Solicitud de ayuda no encontrada');
+      return res.redirect('/users/dashboard');
+    }
+    
+    // Actualizar el estado de la solicitud
+    await HelpRequest.updateStatus(helpRequestId, 'rejected');
+    
+    // Crear notificación para el usuario ciego
+    const Notification = require('../models/Notification');
+    await Notification.create({
+      user_id: helpRequest.user_id,
+      title: 'Solicitud de ayuda rechazada',
+      message: `Tu solicitud de ayuda para el ${new Date(helpRequest.date).toLocaleDateString()} a las ${helpRequest.time} ha sido rechazada.`,
+      type: 'help_request_rejected'
+    });
+    
+    req.flash('success_msg', 'Solicitud de ayuda rechazada');
+    res.redirect('/users/dashboard');
   } catch (error) {
     console.error('Error al rechazar la solicitud de ayuda:', error);
-    req.flash('error_msg', 'Hubo un error al rechazar la solicitud');
-    res.redirect('/users/volunteer-dashboard');
+    req.flash('error_msg', 'Error al rechazar la solicitud de ayuda');
+    res.redirect('/users/dashboard');
+  }
+};
+
+exports.getPendingHelpRequests = async (req, res) => {
+  try {
+    const pendingRequests = await HelpRequest.getAllPending();
+    
+    res.render('helpRequests/pending', {
+      title: 'Solicitudes de Ayuda Pendientes',
+      pendingRequests
+    });
+  } catch (error) {
+    console.error('Error al cargar las solicitudes pendientes:', error);
+    req.flash('error_msg', 'Error al cargar las solicitudes pendientes');
+    res.redirect('/users/dashboard');
   }
 };

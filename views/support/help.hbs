@@ -1,0 +1,139 @@
+{{!-- <link rel="stylesheet" href="/css/help.css">
+<div class="help">
+<h1 style="color: #00f8b6ff;">¿Necesitas Ayuda?</h1>
+<p style="color: white;">Encuentra respuestas a las preguntas más frecuentes o contacta a nuestro equipo de soporte.</p>
+
+<section class="faq-section">
+  <h2>Preguntas Frecuentes</h2>
+  {{#if faqs.length}}
+    {{#each faqs}}
+      <div class="faq-item">
+        <h3>{{this.question}}</h3>
+        <p>{{this.answer}}</p>
+      </div>
+    {{/each}}
+  {{else}}
+    <p style="color: white;">No hay preguntas frecuentes en este momento.</p>
+  {{/if}}
+</section>
+
+<section class="support-section">
+  <h2>Contacto y Soporte</h2>
+  <p>Si no encuentras la respuesta que buscas, puedes contactarnos:</p>
+  <ul>
+    <li>Email: <a href="mailto:ojoahisoporte@gmail.com">ojoahisoporte@gmail.com</a></li>
+    <li>Teléfono: Próximamente se añadira esta información</li>
+    <li>Chat en Vivo: <a href="/support/chat">Iniciar Chat</a></li>
+  </ul>
+</section>
+</div> --}}
+
+{{!-- {{> header}} --}}
+
+<div class="container-fluid py-5" style="background-color: #000; color: #00ffcc;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8 text-center">
+        <h1 class="display-4 mb-4">¿Necesitas Ayuda?</h1>
+        <p class="lead mb-5">Encuentra respuestas a las preguntas más frecuentes o contacta a nuestro equipo de soporte.</p>
+        
+        <h2 class="h3 mb-4">Preguntas Frecuentes</h2>
+        
+        {{#if faqs.length}}
+          <div class="accordion mb-5" id="faqAccordion">
+            {{#each faqs}}
+              <div class="accordion-item bg-dark text-white border-light">
+                <h3 class="accordion-header" id="heading{{this.id}}">
+                  <button class="accordion-button collapsed bg-dark text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{this.id}}" aria-expanded="false" aria-controls="collapse{{this.id}}">
+                    {{this.question}}
+                  </button>
+                </h3>
+                <div id="collapse{{this.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{this.id}}" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    {{{this.answer}}}
+                  </div>
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <div class="alert alert-dark mb-5">
+            No hay preguntas frecuentes en este momento.
+          </div>
+        {{/if}}
+        
+        <div class="card bg-dark text-white border-light mb-4">
+          <div class="card-body" style="background-color: #00ffcc; color: #000;">
+            <h2 class="h3 mb-4">Contacto y Soporte</h2>
+            
+            <p>Si no encuentras la respuesta que buscas, puedes contactarnos:</p>
+            
+            <div class="row mb-3">
+              <div class="col-md-4 text-md-end">
+                <strong>Email:</strong>
+              </div>
+              <div class="col-md-8 text-md-start">
+                <a href="mailto:ojoahisoporte@gmail.com" class="text-dark">ojoahisoporte@gmail.com</a>
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-4 text-md-end">
+                <strong>Teléfono:</strong>
+              </div>
+              <div class="col-md-8 text-md-start">
+                Próximamente se añadirá esta información
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-4 text-md-end">
+                <strong>Chat en Vivo:</strong>
+              </div>
+              <div class="col-md-8 text-md-start">
+                {{#if user}}
+                  <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#startChatModal">
+                    Iniciar Chat
+                  </button>
+                {{else}}
+                  <a href="/auth/login?redirect=/support/help" class="btn btn-dark">Iniciar Sesión para Chatear</a>
+                {{/if}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{#if user}}
+<!-- Modal para iniciar chat -->
+<div class="modal fade" id="startChatModal" tabindex="-1" aria-labelledby="startChatModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" id="startChatModalLabel">Iniciar Chat con Soporte</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/support/create" method="POST">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="subject" class="form-label">¿Sobre qué necesitas ayuda?</label>
+            <input type="text" class="form-control bg-dark text-white border-secondary" id="subject" name="subject" placeholder="Ej: Problema con mi cuenta" required>
+            <div class="form-text text-light">Describe brevemente tu consulta para que podamos ayudarte mejor.</div>
+          </div>
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success">Iniciar Chat</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{{/if}}
+
+{{!-- {{> footer}} --}}
+
+

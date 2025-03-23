@@ -1,0 +1,172 @@
+{{!-- {{> header}} --}}
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+          <h2 class="h4 mb-0">{{volunteer.username}}</h2>
+        </div>
+        <div class="card-body text-center">
+          {{#if volunteer.profile_image}}
+            <img src="{{volunteer.profile_image}}" alt="Foto de {{volunteer.username}}" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+          {{else}}
+            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+              <i class="fas fa-user fa-5x text-secondary"></i>
+            </div>
+          {{/if}}
+          
+          <div class="mb-3">
+            <span class="badge bg-primary fs-6">
+              {{#if volunteer.average_rating}}
+                {{formatNumber volunteer.average_rating 1}} ★
+              {{else}}
+                Sin calificaciones
+              {{/if}}
+            </span>
+            <span class="text-muted">({{volunteer.total_reviews}} reseñas)</span>
+          </div>
+          
+          {{#if volunteer.name}}
+            <p><strong>Nombre:</strong> {{volunteer.name}}</p>
+          {{/if}}
+          
+          {{#if volunteer.email}}
+            <p><strong>Email:</strong> {{volunteer.email}}</p>
+          {{/if}}
+          
+          {{#if volunteer.phone}}
+            <p><strong>Teléfono:</strong> {{volunteer.phone}}</p>
+          {{/if}}
+          
+          <p><strong>Miembro desde:</strong> {{formatDate volunteer.created_at}}</p>
+        </div>
+      </div>
+      
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+          <h3 class="h5 mb-0">Disponibilidad</h3>
+        </div>
+        <div class="card-body">
+          {{#if volunteer.availability}}
+            <p>{{volunteer.availability}}</p>
+          {{else}}
+            <p class="text-muted">No ha especificado su disponibilidad.</p>
+          {{/if}}
+        </div>
+      </div>
+      
+      <div class="d-grid gap-2">
+        <a href="/chat/{{volunteer.id}}" class="btn btn-success">
+          <i class="fas fa-comments"></i> Iniciar Chat
+        </a>
+        
+        {{#unless hasPendingRequest}}
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#requestHelpModal">
+            <i class="fas fa-hands-helping"></i> Solicitar Ayuda
+          </button>
+        {{else}}
+          <button type="button" class="btn btn-secondary" disabled>
+            <i class="fas fa-clock"></i> Solicitud Pendiente
+          </button>
+        {{/unless}}
+        
+        <a href="/users/volunteers" class="btn btn-outline-primary">
+          <i class="fas fa-arrow-left"></i> Volver a la Lista
+        </a>
+      </div>
+    </div>
+    
+    <div class="col-md-8">
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+          <h3 class="h5 mb-0">Biografía</h3>
+        </div>
+        <div class="card-body">
+          {{#if volunteer.bio}}
+            <p>{{volunteer.bio}}</p>
+          {{else}}
+            <p class="text-muted">Este voluntario no ha añadido una biografía.</p>
+          {{/if}}
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h3 class="h5 mb-0">Reseñas</h3>
+          <span class="badge bg-light text-dark">{{volunteer.total_reviews}} reseñas</span>
+        </div>
+        <div class="card-body">
+          {{#if reviews.length}}
+            {{#each reviews}}
+              <div class="border-bottom pb-3 mb-3">
+                <div class="d-flex align-items-center mb-2">
+                  {{#if this.profile_image}}
+                    <img src="{{this.profile_image}}" alt="{{this.username}}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                  {{else}}
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                      <i class="fas fa-user text-secondary"></i>
+                    </div>
+                  {{/if}}
+                  <div>
+                    <h5 class="mb-0">{{this.username}}</h5>
+                    <small class="text-muted">{{formatDate this.created_at}}</small>
+                  </div>
+                  <div class="ms-auto">
+                    <span class="badge bg-primary">{{this.rating}} ★</span>
+                  </div>
+                </div>
+                <p>{{this.comment}}</p>
+              </div>
+            {{/each}}
+          {{else}}
+            <p class="text-muted">Este voluntario aún no tiene reseñas.</p>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para solicitar ayuda -->
+<div class="modal fade" id="requestHelpModal" tabindex="-1" aria-labelledby="requestHelpModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="requestHelpModalLabel">Solicitar Ayuda a {{volunteer.username}}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/help-requests/create" method="POST">
+        <div class="modal-body">
+          <input type="hidden" name="volunteer_id" value="{{volunteer.id}}">
+          
+          <div class="mb-3">
+            <label for="description" class="form-label">Describe qué tipo de ayuda necesitas:</label>
+            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label for="preferred_date" class="form-label">Fecha preferida:</label>
+            <input type="date" class="form-control" id="preferred_date" name="preferred_date" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="preferred_time" class="form-label">Hora preferida:</label>
+            <input type="time" class="form-control" id="preferred_time" name="preferred_time" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="location" class="form-label">Ubicación:</label>
+            <input type="text" class="form-control" id="location" name="location" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Enviar Solicitud</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{!-- {{> footer}} --}}
