@@ -8,6 +8,8 @@
     "dev": "nodemon app.js"
   },
   "dependencies": {
+    "@tensorflow-models/coco-ssd": "^2.2.3",
+    "@tensorflow/tfjs": "^4.22.0",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
     "bootstrap": "^5.3.3",

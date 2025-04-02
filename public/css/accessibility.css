@@ -1,0 +1,87 @@
+/* Estilos para elementos de accesibilidad */
+.accessibility-controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    color: white;
+}
+
+.accessibility-button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.accessibility-button:hover {
+    background: #0056b3;
+}
+
+.accessibility-button[aria-pressed="true"] {
+    background: #28a745;
+}
+
+/* Estilos para texto ampliado */
+.zoom-enabled {
+    transition: all 0.3s ease;
+}
+
+/* Estilos para elementos seleccionados */
+.reading-highlight {
+    background-color: rgba(255, 255, 0, 0.3);
+    outline: 2px solid #007bff;
+}
+
+/* Estilos para el panel de cámara */
+.digital-reader-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    padding: 20px;
+    border-radius: 12px;
+    z-index: 1001;
+}
+
+.digital-reader-panel video {
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+/* Indicador de voz activa */
+.voice-active-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #28a745;
+    color: white;
+    padding: 10px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}

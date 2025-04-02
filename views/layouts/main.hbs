@@ -6,25 +6,108 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {{!-- <link rel="stylesheet" href="/css/styles.css"> --}}
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/accessibility.css">
+
 </head>
 <body>
 
+        {{> header}}
         {{#if success_msg}}
             <div class="alert alert-success">{{success_msg}}</div>
         {{/if}}
         {{#if error_msg}}
             <div class="alert alert-danger">{{error_msg}}</div>
         {{/if}}
-        {{> header}}
+        <div class="accessibility-controls">
+        <button class="accessibility-button" id="toggleVoice" aria-label="Activar asistente de voz">
+            <i class="fas fa-microphone"></i>
+        </button>
+        <button class="accessibility-button" id="toggleReader" aria-label="Activar lector digital">
+            <i class="fas fa-camera"></i>
+        </button>
+        <button class="accessibility-button" id="zoomIn" aria-label="Aumentar texto">
+            <i class="fas fa-search-plus"></i>
+        </button>
+        <button class="accessibility-button" id="zoomOut" aria-label="Reducir texto">
+            <i class="fas fa-search-minus"></i>
+        </button>
+        <button class="accessibility-button" id="readPage" aria-label="Leer página">
+            <i class="fas fa-book-reader"></i>
+        </button>
+    </div>
         {{{body}}}
         {{>footer}}
 
     <script src="/js/main.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/js/chat.js"></script>
+        <script src="/js/notifications.js"></script>
+        <script src="/js/help-requests.js"></script>
+        <script src="/js/reservations.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+        <script src="/js/accessibility/AccessibilityManager.js"></script>
+        <script src="/js/accessibility/DigitalReader.js"></script>
+        <script src="/js/accessibility/PasswordVerbalizer.js"></script>
+<script>
+
+  // Inicializar todos los módulos cuando el usuario está autenticado
+        {{#if user}}
+            document.addEventListener('DOMContentLoaded', () => {
+                initChat('{{user.id}}');
+                initNotifications('{{user.id}}');
+                initHelpRequests('{{user.id}}');
+                initReservations('{{user.id}}');
+            });
+        {{/if}}
+</script>
+
+ <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar el administrador de accesibilidad
+            const accessibilityManager = new AccessibilityManager();
+            const digitalReader = new DigitalReader(accessibilityManager);
+            const passwordVerbalizer = new PasswordVerbalizer(accessibilityManager);
+
+            // Configurar eventos de los botones
+            document.getElementById('toggleVoice').addEventListener('click', () => {
+                accessibilityManager.toggleVoiceAssistant();
+            });
+
+            document.getElementById('toggleReader').addEventListener('click', () => {
+                digitalReader.startObjectDetection();
+            });
+
+            document.getElementById('zoomIn').addEventListener('click', () => {
+                accessibilityManager.zoomIn();
+            });
+
+            document.getElementById('zoomOut').addEventListener('click', () => {
+                accessibilityManager.zoomOut();
+            });
+
+            document.getElementById('readPage').addEventListener('click', () => {
+                accessibilityManager.readCurrentPage();
+            });
+
+            // Mensaje inicial de bienvenida
+            setTimeout(() => {
+                accessibilityManager.speak(
+                    'Bienvenido a OjoAhí. Presione Alt + A para activar el asistente de voz, ' +
+                    'Alt + L para leer la página, Alt + más para aumentar el zoom, ' +
+                    'y Alt + menos para reducir el zoom.'
+                );
+            }, 1000);
+        });
+    </script>
 </body>
 </html>
-    
-
 
 
 

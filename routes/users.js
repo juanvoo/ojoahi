@@ -3,7 +3,7 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
-const { isAuthenticated } = require('../middleware/auth');
+const { isAuthenticated } = require('../middleware/auth'); // Verificar esta línea
 
 // Configuración de multer para la subida de archivos
 const storage = multer.diskStorage({
@@ -28,6 +28,13 @@ const upload = multer({
 
 // Controladores
 const userController = require('../controllers/userController');
+
+// Rutas de perfil (sistema original)
+router.get('/profile', isAuthenticated, userController.getProfile);
+router.get('/profile/edit', isAuthenticated, userController.getEditProfile);
+router.post('/profile/edit', isAuthenticated, userController.postEditProfile);
+router.get('/profile/change-password', isAuthenticated, userController.getChangePassword);
+router.post('/profile/change-password', isAuthenticated, userController.postChangePassword);
 
 // Rutas de dashboard
 router.get('/dashboard', isAuthenticated, async (req, res) => {
@@ -131,13 +138,6 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
     res.redirect('/auth/login');
   }
 });
-
-// Rutas de perfil (sistema original)
-router.get('/profile', isAuthenticated, userController.getProfile);
-router.get('/profile/edit', isAuthenticated, userController.getEditProfile);
-router.post('/profile/edit', isAuthenticated, userController.postEditProfile);
-router.get('/profile/change-password', isAuthenticated, userController.getChangePassword);
-router.post('/profile/change-password', isAuthenticated, userController.postChangePassword);
 
 // Nuevo sistema de perfil
 router.get('/new-profile', isAuthenticated, async (req, res) => {
@@ -515,9 +515,9 @@ router.post('/new-profile/edit', isAuthenticated, upload.single('profile_image')
     // Manejar la imagen subida si existe
     if (req.file) {
       const profileImagePath = `/uploads/profiles/${req.file.filename}`;
-      
+    
       console.log('Ruta de la imagen para la base de datos:', profileImagePath);
-      
+    
       // Añadir la actualización de la imagen a la consulta SQL
       if (columnNames.includes('profile_image')) {
         updateFields.push('profile_image = ?');
@@ -576,7 +576,7 @@ router.post('/new-profile/edit', isAuthenticated, upload.single('profile_image')
       </body>
       </html>
     `);
-  } catch (error) {
+    } catch (error) {
     console.error('Error al actualizar el perfil (nueva ruta):', error);
     res.status(500).send(`
       <!DOCTYPE html>
@@ -596,127 +596,127 @@ router.post('/new-profile/edit', isAuthenticated, upload.single('profile_image')
       </body>
       </html>
     `);
-  }
-});
-
-// Ruta para refrescar la sesión
-router.get('/profile/refresh', isAuthenticated, async (req, res) => {
-  try {
-    const userId = req.session.user.id;
-    const pool = require('../config/database');
-    const [rows] = await pool.execute('SELECT * FROM users WHERE id = ?', [userId]);
+    }
+    });
     
-    if (rows.length > 0) {
-      req.session.user = rows[0];
-      req.session.save(err => {
-        if (err) {
-          console.error('Error al guardar la sesión:', err);
+    // Ruta para refrescar la sesión
+    router.get('/profile/refresh', isAuthenticated, async (req, res) => {
+      try {
+        const userId = req.session.user.id;
+        const pool = require('../config/database');
+        const [rows] = await pool.execute('SELECT * FROM users WHERE id = ?', [userId]);
+    
+        if (rows.length > 0) {
+          req.session.user = rows[0];
+          req.session.save(err => {
+            if (err) {
+              console.error('Error al guardar la sesión:', err);
+            }
+            res.redirect('/users/profile');
+          });
+        } else {
+          req.flash('error_msg', 'No se pudo actualizar la sesión');
+          res.redirect('/users/profile');
         }
+      } catch (error) {
+        console.error('Error al refrescar los datos del usuario:', error);
+        req.flash('error_msg', 'Error al refrescar los datos');
         res.redirect('/users/profile');
-      });
-    } else {
-      req.flash('error_msg', 'No se pudo actualizar la sesión');
-      res.redirect('/users/profile');
-    }
-  } catch (error) {
-    console.error('Error al refrescar los datos del usuario:', error);
-    req.flash('error_msg', 'Error al refrescar los datos');
-    res.redirect('/users/profile');
-  }
-});
-
-// Lista de voluntarios disponibles
-router.get('/volunteers', isAuthenticated, async (req, res) => {
-  try {
-    if (req.session.user.role !== 'blind') {
-      req.flash('error_msg', 'Acceso no autorizado');
-      return res.redirect('/users/dashboard');
-    }
-
-    const pool = require('../config/database');
-    
-    // Obtener todos los voluntarios con sus calificaciones promedio
-    const [volunteers] = await pool.execute(`
-      SELECT u.*, 
-             COALESCE(AVG(r.rating), 0) as average_rating,
-             COUNT(r.id) as total_reviews
-      FROM users u
-      LEFT JOIN reviews r ON u.id = r.volunteer_id
-      WHERE u.role = 'volunteer'
-      GROUP BY u.id
-      ORDER BY average_rating DESC
-    `);
-
-    res.render('users/volunteer-list', {
-      user: req.session.user,
-      volunteers,
-      title: 'Voluntarios Disponibles'
+      }
     });
-  } catch (error) {
-    console.error('Error al cargar la lista de voluntarios:', error);
-    req.flash('error_msg', 'Error al cargar la lista de voluntarios');
-    res.redirect('/users/dashboard');
-  }
-});
-
-// Ver perfil de un voluntario específico
-router.get('/volunteers/:id', isAuthenticated, async (req, res) => {
-  try {
-    if (req.session.user.role !== 'blind') {
-      req.flash('error_msg', 'Acceso no autorizado');
-      return res.redirect('/users/dashboard');
-    }
-
-    const volunteerId = req.params.id;
-    const pool = require('../config/database');
     
-    // Obtener información del voluntario
-    const [volunteerRows] = await pool.execute(`
-      SELECT u.*, 
-             COALESCE(AVG(r.rating), 0) as average_rating,
-             COUNT(r.id) as total_reviews
-      FROM users u
-      LEFT JOIN reviews r ON u.id = r.volunteer_id
-      WHERE u.id = ? AND u.role = 'volunteer'
-      GROUP BY u.id
-    `, [volunteerId]);
-
-    if (volunteerRows.length === 0) {
-      req.flash('error_msg', 'Voluntario no encontrado');
-      return res.redirect('/users/volunteers');
-    }
-
-    const volunteer = volunteerRows[0];
+    // Lista de voluntarios disponibles
+    router.get('/volunteers', isAuthenticated, async (req, res) => {
+      try {
+        if (req.session.user.role !== 'blind') {
+          req.flash('error_msg', 'Acceso no autorizado');
+          return res.redirect('/users/dashboard');
+        }
     
-    // Obtener reseñas del voluntario
-    const [reviews] = await pool.execute(`
-      SELECT r.*, u.username, u.profile_image
-      FROM reviews r
-      JOIN users u ON r.user_id = u.id
-      WHERE r.volunteer_id = ?
-      ORDER BY r.created_at DESC
-    `, [volunteerId]);
-
-    // Verificar si el usuario ya tiene una solicitud pendiente con este voluntario
-    const [pendingRequests] = await pool.execute(`
-      SELECT * FROM help_requests 
-      WHERE user_id = ? AND volunteer_id = ? AND status = 'pending'
-    `, [req.session.user.id, volunteerId]);
-
-    const hasPendingRequest = pendingRequests.length > 0;
-
-    res.render('users/volunteer-profile', {
-      user: req.session.user,
-      volunteer,
-      reviews,
-      hasPendingRequest,
-      title: `Perfil de ${volunteer.username}`
+        const pool = require('../config/database');
+    
+        // Obtener todos los voluntarios con sus calificaciones promedio
+        const [volunteers] = await pool.execute(`
+          SELECT u.*, 
+                 COALESCE(AVG(r.rating), 0) as average_rating,
+                 COUNT(r.id) as total_reviews
+          FROM users u
+          LEFT JOIN reviews r ON u.id = r.volunteer_id
+          WHERE u.role = 'volunteer'
+          GROUP BY u.id
+          ORDER BY average_rating DESC
+        `);
+    
+        res.render('users/volunteer-list', {
+          user: req.session.user,
+          volunteers,
+          title: 'Voluntarios Disponibles'
+        });
+      } catch (error) {
+        console.error('Error al cargar la lista de voluntarios:', error);
+        req.flash('error_msg', 'Error al cargar la lista de voluntarios');
+        res.redirect('/users/dashboard');
+      }
     });
-  } catch (error) {
-    console.error('Error al cargar el perfil del voluntario:', error);
-    req.flash('error_msg', 'Error al cargar el perfil del voluntario');
-    res.redirect('/users/volunteers');
-  }
-});
-
-module.exports = router;
+    
+    // Ver perfil de un voluntario específico
+    router.get('/volunteers/:id', isAuthenticated, async (req, res) => {
+      try {
+        if (req.session.user.role !== 'blind') {
+          req.flash('error_msg', 'Acceso no autorizado');
+          return res.redirect('/users/dashboard');
+        }
+    
+        const volunteerId = req.params.id;
+        const pool = require('../config/database');
+    
+        // Obtener información del voluntario
+        const [volunteerRows] = await pool.execute(`
+          SELECT u.*, 
+                 COALESCE(AVG(r.rating), 0) as average_rating,
+                 COUNT(r.id) as total_reviews
+          FROM users u
+          LEFT JOIN reviews r ON u.id = r.volunteer_id
+          WHERE u.id = ? AND u.role = 'volunteer'
+          GROUP BY u.id
+        `, [volunteerId]);
+    
+        if (volunteerRows.length === 0) {
+          req.flash('error_msg', 'Voluntario no encontrado');
+          return res.redirect('/users/volunteers');
+        }
+    
+        const volunteer = volunteerRows[0];
+    
+        // Obtener reseñas del voluntario
+        const [reviews] = await pool.execute(`
+          SELECT r.*, u.username, u.profile_image
+          FROM reviews r
+          JOIN users u ON r.user_id = u.id
+          WHERE r.volunteer_id = ?
+          ORDER BY r.created_at DESC
+        `, [volunteerId]);
+    
+        // Verificar si el usuario ya tiene una solicitud pendiente con este voluntario
+        const [pendingRequests] = await pool.execute(`
+          SELECT * FROM help_requests 
+          WHERE user_id = ? AND volunteer_id = ? AND status = 'pending'
+        `, [req.session.user.id, volunteerId]);
+    
+        const hasPendingRequest = pendingRequests.length > 0;
+    
+        res.render('users/volunteer-profile', {
+          user: req.session.user,
+          volunteer,
+          reviews,
+          hasPendingRequest,
+          title: `Perfil de ${volunteer.username}`
+        });
+      } catch (error) {
+        console.error('Error al cargar el perfil del voluntario:', error);
+        req.flash('error_msg', 'Error al cargar el perfil del voluntario');
+        res.redirect('/users/volunteers');
+      }
+    });
+    
+    module.exports = router;

@@ -48,6 +48,7 @@ exports.login = async (req, res) => {
 exports.register = async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
+    console.log('Datos recibidos:', req.body);
     
     // Validación básica
     if (!username || !email || !password || !role) {
@@ -70,6 +71,7 @@ exports.register = async (req, res) => {
       role,
       user_type: role // Asegurarse de que user_type y role sean iguales
     });
+    console.log('Usuario creado con ID:', userId);
     
     req.flash('success_msg', 'Te has registrado exitosamente');
     res.redirect('/login');

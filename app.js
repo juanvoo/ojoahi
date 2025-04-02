@@ -9,8 +9,15 @@ const moment = require('moment');
 const fileUpload = require('express-fileupload');
 const fs = require('fs');
 const hbs = require('express-handlebars');
+const http = require('http');
+const socketIO = require('socket.io');
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIO(server);
+
+// Almacena usuarios conectados
+const connectedUsers = new Map();
 
 Handlebars.registerHelper('formatDate', function(date) {
   return new Date(date).toLocaleString('es-ES', { 
@@ -117,6 +124,36 @@ i18n.configure({
 });
 app.use(i18n.init);
 
+// Configuración de Socket.IO
+io.on('connection', (socket) => {
+  console.log('Cliente conectado:', socket.id);
+
+  // Manejar la autenticación del usuario
+  socket.on('userAuthenticated', (userId) => {
+    connectedUsers.set(userId, socket.id);
+    io.emit('userStatusChanged', {
+      userId: userId,
+      status: 'online'
+    });
+  });
+
+  // Manejar desconexión
+  socket.on('disconnect', () => {
+    console.log('Cliente desconectado:', socket.id);
+    // Encontrar y eliminar usuario desconectado
+    for (const [userId, socketId] of connectedUsers.entries()) {
+      if (socketId === socket.id) {
+        connectedUsers.delete(userId);
+        io.emit('userStatusChanged', {
+          userId: userId,
+          status: 'offline'
+        });
+        break;
+      }
+    }
+  });
+});
+
 // Middleware para hacer __ accesible en las vistas
 app.use((req, res, next) => {
   res.locals.__ = res.__ = function() {
@@ -130,6 +167,12 @@ app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
   res.locals.user = req.session.user || null;
+  next();
+});
+
+// Middleware para hacer io accesible en las rutas
+app.use((req, res, next) => {
+  req.io = io;
   next();
 });
 
@@ -206,6 +249,5 @@ FAQ.createTable().catch(console.error);
 app.use('/support', supportRoutes);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
-
+server.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
 module.exports = app;

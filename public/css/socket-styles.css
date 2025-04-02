@@ -1,0 +1,83 @@
+/* Estilos para el chat */
+.chat-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .message {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  
+  .message.sent {
+    background-color: #e3f2fd;
+    margin-left: 20%;
+  }
+  
+  .message.received {
+    background-color: #f5f5f5;
+    margin-right: 20%;
+  }
+  
+  /* Estilos para notificaciones */
+  .notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+  }
+  
+  .notification {
+    background-color: #fff;
+    border-left: 4px solid #4CAF50;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    margin-bottom: 10px;
+    padding: 15px;
+    min-width: 300px;
+  }
+  
+  /* Estilos para solicitudes de ayuda */
+  .help-request {
+    border: 1px solid #ddd;
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 4px;
+  }
+  
+  .status {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+  }
+  
+  .status.pending {
+    background-color: #FFF3CD;
+    color: #856404;
+  }
+  
+  .status.in-progress {
+    background-color: #CCE5FF;
+    color: #004085;
+  }
+  
+  .status.completed {
+    background-color: #D4EDDA;
+    color: #155724;
+  }
+  
+  /* Estilos para reservaciones */
+  .reservation {
+    border: 1px solid #e0e0e0;
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 4px;
+    background-color: #fff;
+  }
+  
+  .reservation-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
