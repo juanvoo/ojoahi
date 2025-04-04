@@ -60,9 +60,7 @@ class HelpRequest {
          FROM help_requests hr 
          JOIN users u ON hr.user_id = u.id 
          WHERE hr.status = 'pending' 
-         AND hr.id NOT IN (
-           SELECT help_request_id FROM reservations WHERE volunteer_id = ?
-         )
+         AND hr.volunteer_id = ?  -- Only show requests assigned to this volunteer
          ORDER BY hr.created_at DESC`,
         [volunteerId]
       );

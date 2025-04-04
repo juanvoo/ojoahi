@@ -16,6 +16,14 @@ exports.createReservation = async (req, res) => {
   try {
     const { volunteerId, date, time, description, isVideoCall } = req.body;
     const userId = req.session.user.id;
+    
+    // Validar que el volunteerId sea válido
+    const volunteer = await Volunteer.findById(volunteerId);
+    if (!volunteer) {
+      req.flash('error_msg', 'Voluntario no encontrado');
+      return res.redirect('/reservations/create');
+    }
+    
     await Reservation.create(userId, volunteerId, date, time, description, isVideoCall === 'on');
     req.flash('success_msg', 'Reserva creada exitosamente');
     res.redirect('/reservations');

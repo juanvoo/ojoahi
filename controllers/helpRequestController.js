@@ -113,7 +113,11 @@ exports.rejectHelpRequest = async (req, res) => {
 
 exports.getPendingHelpRequests = async (req, res) => {
   try {
-    const pendingRequests = await HelpRequest.getAllPending();
+    // Get the volunteer ID from the session
+    const volunteerId = req.session.user.id;
+    
+    // Instead of getAllPending(), use getPendingByVolunteerId()
+    const pendingRequests = await HelpRequest.getPendingByVolunteerId(volunteerId);
     
     res.render('helpRequests/pending', {
       title: 'Solicitudes de Ayuda Pendientes',

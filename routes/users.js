@@ -719,4 +719,39 @@ router.post('/new-profile/edit', isAuthenticated, upload.single('profile_image')
       }
     });
     
+    // routes/volunteers.js o donde tengas esta ruta
+router.get('/profile/:id', isAuthenticated, async (req, res) => {
+  try {
+    const volunteerId = req.params.id;
+    const volunteer = await Volunteer.findById(volunteerId);
+    
+    if (!volunteer) {
+      req.flash('error_msg', 'Voluntario no encontrado');
+      return res.redirect('/volunteers');
+    }
+    
+    // Aquí está el problema: no deberías mostrar las reservas en el perfil público
+    // a menos que el usuario que está viendo sea el propio voluntario
+    let reservations = [];
+    
+    // Solo mostrar reservas si el usuario logueado es este voluntario
+    if (req.session.user && volunteer.user_id === req.session.user.id) {
+      reservations = await Reservation.getByVolunteerId(volunteerId);
+    }
+    
+    const reviews = await Review.getByVolunteerId(volunteerId);
+    
+    res.render('volunteers/profile', {
+      title: `Perfil de ${volunteer.name}`,
+      volunteer,
+      reservations, // Solo se mostrarán si el usuario es el propio voluntario
+      reviews,
+      isOwnProfile: req.session.user && volunteer.user_id === req.session.user.id
+    });
+  } catch (error) {
+    console.error('Error al cargar el perfil:', error);
+    req.flash('error_msg', 'Error al cargar el perfil: ' + error.message);
+    res.redirect('/volunteers');
+  }
+});
     module.exports = router;

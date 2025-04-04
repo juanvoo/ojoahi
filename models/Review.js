@@ -1,17 +1,12 @@
 const pool = require('../config/database');
-
+const db = require('../config/database');
 class Review {
-  static async create({ reservation_id, user_id, volunteer_id, rating, comment }) {
-    try {
-      const sql = 'INSERT INTO reviews (reservation_id, user_id, volunteer_id, rating, comment) VALUES (?, ?, ?, ?, ?)';
-      const params = [reservation_id || null, user_id, volunteer_id, rating, comment];
-
-      const [result] = await pool.execute(sql, params);
-      return result.insertId;
-    } catch (error) {
-      console.error('Error al crear la reseña:', error);
-      throw error;
-    }
+  static async create(userId, volunteerId, reservationId, rating, comment) {
+    const [result] = await db.execute(
+      'INSERT INTO reviews (user_id, volunteer_id, reservation_id, rating, comment) VALUES (?, ?, ?, ?, ?)',
+      [userId, volunteerId, reservationId, rating, comment]
+    );
+    return result.insertId;
   }
 
   static async getByUserId(userId) {
@@ -36,24 +31,15 @@ class Review {
   }
 
   static async getByVolunteerId(volunteerId) {
-    try {
-      console.log(`Buscando reseñas para el voluntario con ID: ${volunteerId}`);
-      
-      const [rows] = await pool.execute(
-        `SELECT r.*, u.username as user_name 
-         FROM reviews r 
-         JOIN users u ON r.user_id = u.id 
-         WHERE r.volunteer_id = ?
-         ORDER BY r.created_at DESC`,
-        [volunteerId]
-      );
-      
-      console.log(`Encontradas ${rows.length} reseñas para el voluntario ${volunteerId}`);
-      return rows;
-    } catch (error) {
-      console.error('Error al obtener las reseñas del voluntario:', error);
-      throw error;
-    }
+    const [rows] = await db.execute(
+      `SELECT r.*, u.username as user_name 
+       FROM reviews r 
+       JOIN users u ON r.user_id = u.id 
+       WHERE r.volunteer_id = ?
+       ORDER BY r.created_at DESC`,
+      [volunteerId]
+    );
+    return rows;
   }
 
   static async getReservationById(reservationId) {

@@ -66,21 +66,24 @@ class AccessibilityManager {
         loadVoices();
     }
 
-    // Función para hablar texto
-    speak(text, options = {}) {
-        if (!this.speechSynthesis) return;
-
-        // Detener cualquier lectura en curso
-        this.stopReading();
-
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.voice = this.defaultVoice;
-        utterance.rate = options.rate || 1;
-        utterance.pitch = options.pitch || 1;
-        utterance.volume = options.volume || 1;
-
-        this.speechSynthesis.speak(utterance);
-    }
+// Función para hablar texto
+speak(text, options = {}) {
+    if (!this.speechSynthesis) return;
+  
+    // Detener cualquier lectura en curso
+    this.stopReading();
+  
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.voice = this.defaultVoice;
+    utterance.rate = options.rate || 0.8; // Velocidad más lenta por defecto
+    utterance.pitch = options.pitch || 1;
+    utterance.volume = options.volume || 1;
+  
+    // Agregar pausas después de oraciones, enlaces, botones y encabezados
+    utterance.text = text.replace(/([,.!?;:])\s*/g, '$1 ').replace(/(<a [^>]+>[^<]+<\/a>)/g, '$1. ').replace(/(<button [^>]+>[^<]+<\/button>)/g, '$1. ').replace(/(<h[1-6]>[^<]+<\/h[1-6]>)/g, '$1. ');
+  
+    this.speechSynthesis.speak(utterance);
+  }
 
     // Detener lectura
     stopReading() {

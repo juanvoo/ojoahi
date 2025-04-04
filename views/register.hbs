@@ -1,43 +1,6 @@
-<div class="mantener">
-<h2 class="registro" style="color: #00f8b6ff;">{{__ 'Registrarse'}}</h2>
-<div class="form-container">
-    {{#if error_msg}}
-    <div class="alert alert-danger">{{error_msg}}</div>
-    {{/if}}
-    <form action="/register" method="POST" class="form">
-        <div class="form-group">
-            <label for="username">Nombre de usuario:</label>
-            <input type="text" id="username" name="username" value="{{username}}" required>
-        </div>
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="{{email}}" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Contraseña:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <div class="form-group">
-            <label for="confirmPassword">Confirmar Contraseña:</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" required>
-        </div>
-        <div class="form-group">
-            <label for="userType">Tipo de Usuario:</label>
-            <select id="userType" name="userType" required>
-                <option value="blind">Seleccione una opción</option>
-                <option value="blind" {{#if (eq userType "blind")}}selected{{/if}}>Usuario Ciego</option>
-                <option value="volunteer" {{#if (eq userType "volunteer")}}selected{{/if}}>Voluntario</option>
-            </select>
-        </div>
-        <button type="submit">{{__ 'Register'}}</button>
-    </form>
-</div>
-<p class="account2">{{__ 'AlreadyHaveAccount'}} <a href="/login">{{__ 'Login'}}</a></p>
-</div>
-
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-<section class="register-section py-5" style="background-color: #0d0d0dff;">
+<section class="register-section py-5" style="background-color: #5dd62c;">
   <div class="container py-5">
     <div class="row justify-content-center">
       <div class="col-md-8 col-lg-6">
@@ -51,12 +14,12 @@
             
             <form action="/register" method="POST" class="form">
               <div class="mb-4">
-                <label for="name" class="form-label">Nombre completo</label>
+                <label for="username" class="form-label">Nombre completo</label>
                 <div class="input-group">
                   <span class="input-group-text bg-light border-end-0">
                     <i class="fas fa-user text-muted"></i>
                   </span>
-                  <input type="text" class="form-control border-start-0" id="name" name="name" placeholder="Tu nombre completo" value="{{username}}" required>
+                  <input type="text" class="form-control border-start-0" id="username" name="username" placeholder="Tu nombre completo" value="{{username}}" required>
                 </div>
               </div>
               
@@ -102,8 +65,8 @@
               </div>
               
               <div class="mb-4">
-                <label for="user_type" class="form-label">Tipo de usuario</label>
-                <select class="form-select" id="user_type" name="user_type" required>
+                <label for="role" class="form-label">Tipo de usuario</label>
+                <select class="form-select" id="role" name="role" required>
                   <option value="" selected disabled>Selecciona una opción</option>
                   <option value="blind" {{#if (eq userType "blind")}}selected{{/if}}>Persona con discapacidad visual</option>
                   <option value="volunteer" {{#if (eq userType "volunteer")}}selected{{/if}}>Voluntario</option>
