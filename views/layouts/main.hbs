@@ -12,17 +12,11 @@
     {{!-- <link rel="stylesheet" href="/css/styles.css"> --}}
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/accessibility.css">
-
+    <link rel="stylesheet" href="/css/alerts.css">
 </head>
 <body>
 
         {{> header}}
-        {{#if success_msg}}
-            <div class="alert alert-success">{{success_msg}}</div>
-        {{/if}}
-        {{#if error_msg}}
-            <div class="alert alert-danger">{{error_msg}}</div>
-        {{/if}}
         <div class="accessibility-controls">
         <button class="accessibility-button" id="toggleVoice" aria-label="Activar asistente de voz">
             <i class="fas fa-microphone"></i>
@@ -55,6 +49,8 @@
         <script src="/js/accessibility/AccessibilityManager.js"></script>
         <script src="/js/accessibility/DigitalReader.js"></script>
         <script src="/js/accessibility/PasswordVerbalizer.js"></script>
+        <script src="/js/alerts.js"></script>
+
 <script>
 
   // Inicializar todos los módulos cuando el usuario está autenticado
@@ -104,6 +100,19 @@
                     'y Alt + menos para reducir el zoom.'
                 );
             }, 1000);
+        });
+
+        // Convertir las alertas existentes al nuevo formato
+        document.addEventListener('DOMContentLoaded', () => {
+            const successMsg = '{{success_msg}}';
+            const errorMsg = '{{error_msg}}';
+            
+            if (successMsg) {
+                alertManager.success(successMsg, 'Éxito');
+            }
+            if (errorMsg) {
+                alertManager.error(errorMsg, 'Error');
+            }
         });
     </script>
 </body>
