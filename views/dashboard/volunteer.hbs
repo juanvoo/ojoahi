@@ -1,70 +1,3 @@
-{{!-- <link rel="stylesheet" href="/css/dashvolunteer.css">
-<link rel="stylesheet" href="/css/delete.css">
-<div class="volunteer">
-<h1 style="background-color: #0d0d0dff; color:#00f8b6ff">Bienvenido, {{user.username}}!</h1>
-<br>
-<section>
-  <h2 style="color: white;">{{__ 'YourReviews'}}</h2>
-  {{#if reviews.length}}
-    {{#each reviews}}
-      <div class="review">
-        <p>{{__ 'Rating'}}: {{this.rating}}/5</p>
-        <p>{{this.comment}}</p>
-        <p>{{__ 'By'}}: {{this.user_name}} - {{formatDate this.created_at}}</p>
-      </div>
-    {{/each}}
-  {{else}}
-    <p style="color: white;">{{__ 'NoReviewsYet'}}</p>
-  {{/if}}
-</section>
-
-<br>
-<section>
-  <h2 style="color: white;">{{__ 'ReservationRequests'}}</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>{{__ 'Date'}}</th>
-        <th>{{__ 'Time'}}</th>
-        <th>{{__ 'User'}}</th>
-        <th>{{__ 'Description'}}</th>
-        <th>{{__ 'Status'}}</th>
-        <th>{{__ 'Actions'}}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each reservations}}
-        <tr>
-          <td>{{formatDate this.date}}</td>
-          <td>{{this.time}}</td>
-          <td>{{this.user_name}}</td>
-          <td>{{this.description}}</td>
-          <td>{{__ this.status}}</td>
-          <td>
-            {{#if (eq this.status 'pending')}}
-              <form action="/reservations/accept/{{this.id}}" method="POST" style="display: inline;">
-                <button type="submit">{{__ 'Accept'}}</button>
-              </form>
-              <form action="/reservations/reject/{{this.id}}" method="POST" style="display: inline;">
-                <button type="submit">{{__ 'Reject'}}</button>
-              </form>
-            {{/if}}
-          </td>
-        </tr>
-      {{/each}}
-    </tbody>
-  </table>
-</section>
-<div class="delete-account-section">
-  <h2>Eliminar cuenta</h2>
-  <p>¡Atención! Esta acción es irreversible y eliminará permanentemente tu cuenta y todos tus datos asociados.</p>
-  <form action="/users/delete-account" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.');">
-    <button type="submit" class="btn btn-danger">Eliminar mi cuenta</button>
-  </form>
-</div>
-</div> --}}
-
-
 <h1>Bienvenido, {{user.username}}!</h1>
 
 {{#if notifications.length}}
@@ -108,7 +41,6 @@
         <th>Usuario</th>
         <th>Descripción</th>
         <th>Estado</th>
-        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -118,19 +50,21 @@
           <td>{{this.time}}</td>
           <td>{{this.user_name}}</td>
           <td>{{this.description}}</td>
-          <td>{{this.status}}</td>
           <td>
-            {{#if (eq this.status "pending")}}
-              <a href="/reservations/complete/{{this.id}}" class="btn btn-success">Completar</a>
-              <a href="/reservations/cancel/{{this.id}}" class="btn btn-danger">Cancelar</a>
-            {{/if}}
+            <span class="badge {{#if (eq this.status 'accepted')}}bg-success{{else}}bg-danger{{/if}}">
+              {{#if (eq this.status 'accepted')}}
+                Aceptada
+              {{else}}
+                Rechazada
+              {{/if}}
+            </span>
           </td>
         </tr>
       {{/each}}
     </tbody>
   </table>
 {{else}}
-  <p>No tienes reservas</p>
+  <p>No tienes reservas aceptadas o rechazadas</p>
 {{/if}}
 
 <h2>Tus Reseñas</h2>

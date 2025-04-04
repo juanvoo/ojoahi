@@ -48,15 +48,21 @@ class Reservation {
   }
 
   static async getByVolunteerId(volunteerId) {
-    const [rows] = await db.execute(
-      `SELECT hr.*, u.username as user_name 
-       FROM help_requests hr 
-       JOIN users u ON hr.user_id = u.id 
-       WHERE hr.volunteer_id = ?
-       ORDER BY hr.date DESC, hr.time DESC`,
-      [volunteerId]
-    );
-    return rows;
+    try {
+      const [rows] = await pool.execute(
+        `SELECT hr.*, u.username as user_name, hr.status
+         FROM help_requests hr 
+         JOIN users u ON hr.user_id = u.id 
+         WHERE hr.volunteer_id = ? AND hr.status IN ('accepted', 'rejected')
+         ORDER BY hr.date DESC, hr.time DESC`,
+        [volunteerId]
+      );
+      console.log(`Encontradas ${rows.length} reservas para el voluntario ${volunteerId}`);
+      return rows;
+    } catch (error) {
+      console.error('Error al obtener las reservas del voluntario:', error);
+      throw error;
+    }
   }
 
   static async updateStatus(id, status) {

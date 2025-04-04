@@ -17,33 +17,33 @@ exports.getAllVolunteers = async (req, res) => {
   }
 };
 
-exports.getVolunteerDashboard = async (req, res) => {
-  try {
-    const volunteerId = req.session.user.id;
-    if (!volunteerId) {
-      throw new Error('Usuario no autenticado');
-    }
+// exports.getVolunteerDashboard = async (req, res) => {
+//   try {
+//     const volunteerId = req.session.user.id;
+//     if (!volunteerId) {
+//       throw new Error('Usuario no autenticado');
+//     }
 
-    const volunteer = await User.findById(volunteerId);
-    if (!volunteer) {
-      throw new Error('Voluntario no encontrado');
-    }
+//     const volunteer = await User.findById(volunteerId);
+//     if (!volunteer) {
+//       throw new Error('Voluntario no encontrado');
+//     }
 
-    const reviews = await Review.getReviewsForVolunteer(volunteerId);
-    const helpRequests = await HelpRequest.getRequestsForVolunteer(volunteerId);
+//     const reviews = await Review.getReviewsForVolunteer(volunteerId);
+//     const helpRequests = await HelpRequest.getRequestsForVolunteer(volunteerId);
 
-    res.render('volunteer-dashboard', {
-      title: 'Dashboard del Voluntario',
-      volunteer,
-      reviews,
-      helpRequests
-    });
-  } catch (error) {
-    console.error('Error en el dashboard del voluntario:', error);
-    req.flash('error_msg', 'Hubo un error al cargar tu dashboard. Por favor, intenta de nuevo más tarde.');
-    res.redirect('/');
-  }
-};
+//     res.render('volunteer-dashboard', {
+//       title: 'Dashboard del Voluntario',
+//       volunteer,
+//       reviews,
+//       helpRequests
+//     });
+//   } catch (error) {
+//     console.error('Error en el dashboard del voluntario:', error);
+//     req.flash('error_msg', 'Hubo un error al cargar tu dashboard. Por favor, intenta de nuevo más tarde.');
+//     res.redirect('/');
+//   }
+// };
 
 exports.acceptHelpRequest = async (req, res) => {
   try {
