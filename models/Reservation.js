@@ -46,11 +46,11 @@ class Reservation {
       console.log(`Buscando reservas para el usuario con ID: ${userId}`);
       
       const [rows] = await pool.execute(
-        `SELECT r.*, u.username as volunteer_name 
-         FROM reservations r 
-         JOIN users u ON r.volunteer_id = u.id 
-         WHERE r.user_id = ?
-         ORDER BY r.date DESC, r.time DESC`,
+        `SELECT hr.*, u.username as volunteer_name 
+         FROM help_requests hr 
+         LEFT JOIN users u ON hr.volunteer_id = u.id 
+         WHERE hr.user_id = ?
+         ORDER BY hr.date DESC, hr.time DESC`,
         [userId]
       );
       

@@ -275,77 +275,50 @@
     <section class="reservations-section" aria-labelledby="reservations-title">
       <h2 id="reservations-title">Mis Reservas</h2>
       {{#if reservations.length}}
-        <div class="table-responsive">
-          <table class="modern-table" role="grid">
-            <thead>
-              <tr>
-                <th scope="col">Fecha</th>
-                <th scope="col">Hora</th>
-                <th scope="col">Voluntario</th>
-                <th scope="col">Estado</th>
-                <th scope="col">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{#each reservations}}
-                <tr>
-                  <td>{{formatDate this.date}}</td>
-                  <td>{{this.time}}</td>
-                  <td>{{this.volunteer_name}}</td>
-                  <td>
-                    <span class="status-badge {{this.status}}">{{this.status}}</span>
-                  </td>
-                  <td>
-                    <div class="table-actions">
-                      {{#if (eq this.status "completed")}}
-                        <button 
-                          onclick="window.location.href='/reviews/create/{{this.id}}'"
-                          class="btn-modern small success"
-                          aria-label="Dejar reseña para {{this.volunteer_name}}">
-                          Dejar Reseña
-                        </button>
-                      {{/if}}
-                      {{#if (eq this.status "pending")}}
-                        <button 
-                          onclick="cancelReservation('{{this.id}}')"
-                          class="btn-modern small danger"
-                          aria-label="Cancelar reserva con {{this.volunteer_name}}">
-                          Cancelar
-                        </button>
-                      {{/if}}
-                    </div>
-                  </td>
-                </tr>
-              {{/each}}
-            </tbody>
-          </table>
-        </div>
-      {{else}}
-        <p class="no-data">No tienes reservas activas</p>
-      {{/if}}
+  <div class="reservations-list">
+    {{#each reservations}}
+      <div class="reservation-card">
+        <h3>Reserva con {{volunteer_name}}</h3>
+        <p><strong>Fecha:</strong> {{formatDate date}}</p>
+        <p><strong>Hora:</strong> {{time}}</p>
+        <p><strong>Estado:</strong> <span class="status" data-status="{{status}}">{{status}}</span></p>
+        <p><strong>Descripción:</strong> {{description}}</p>
+        {{#if (eq status "pending")}}
+          <button class="cancel-btn" data-id="{{id}}" aria-label="Cancelar reserva">
+            Cancelar
+          </button>
+        {{/if}}
+      </div>
+    {{/each}}
+  </div>
+{{else}}
+  <div class="no-reservations">
+    <p>No tienes reservas activas</p>
+  </div>
+{{/if}}
     </section>
 
     <!-- Sección de Mis Reseñas -->
     <section class="reviews-section" aria-labelledby="reviews-title">
       <h2 id="reviews-title">Mis Reseñas</h2>
-      {{#if reviews.length}}
-        <div class="reviews-grid">
-          {{#each reviews}}
-            <div class="review-card">
-              <div class="review-header">
-                <h3>{{this.volunteer_name}}</h3>
-                <div class="rating">
-                  {{#times this.rating}}⭐{{/times}}
-                </div>
-              </div>
-              <p class="review-comment">{{this.comment}}</p>
-              <small class="review-date">{{formatDate this.created_at}}</small>
-            </div>
-          {{/each}}
+      <div class="reviews-section">
+  {{#if reviews.length}}
+    <div class="reviews-list">
+      {{#each reviews}}
+        <div class="review-card">
+          <h3>Reseña para {{volunteer_name}}</h3>
+          <div class="rating">
+            {{#times rating}}⭐{{/times}}
+          </div>
+          <p class="review-comment">{{comment}}</p>
+          <p class="review-date">{{formatDate created_at}}</p>
         </div>
-      {{else}}
-        <p class="no-data">Aún no has dejado reseñas</p>
-      {{/if}}
+      {{/each}}
+    </div>
+  {{else}}
+    <p>No has realizado ninguna reseña todavía</p>
+  {{/if}}
+</div>
     </section>
   </main>
 </div>
@@ -513,24 +486,64 @@
 }
 
 /* Reseñas */
-.reviews-grid {
+.reviews-section {
+  margin: 20px 0;
+  padding: 20px;
+}
+
+.reviews-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
 }
 
 .review-card {
-  background: var(--card-background);
-  border-radius: var(--border-radius);
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
 }
 
-.review-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+.review-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.review-card h3 {
+  font-size: 1.1em;
+  color: #444;
+  margin: 0 0 10px;
+}
+
+.review-card .rating {
+  color: #ffc107;
+  font-size: 1.2em;
+  margin: 10px 0;
+}
+
+.review-card .review-comment {
+  color: #555;
+  font-size: 0.95em;
+  line-height: 1.4;
+  margin: 10px 0;
+}
+
+.review-card .review-date {
+  color: #777;
+  font-size: 0.85em;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .reviews-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .reviews-section {
+    padding: 10px;
+  }
 }
 
 /* Botones */
@@ -849,6 +862,149 @@
     padding: 1rem;
   }
 }
+
+/* Reservations List Styles */
+.reservations-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.reservation-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.reservation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.reservation-card h3 {
+  font-size: 1.2em;
+  color: #444;
+  margin: 0 0 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.reservation-card p {
+  font-size: 0.95em;
+  color: #555;
+  margin: 8px 0;
+  line-height: 1.4;
+}
+
+/* Status styles */
+.reservation-card .status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 0.85em;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.reservation-card .status[data-status="pending"] {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+.reservation-card .status[data-status="accepted"] {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.reservation-card .status[data-status="rejected"] {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Cancel button styles */
+.reservation-card .cancel-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  margin-top: 15px;
+  font-size: 0.9em;
+  color: #fff;
+  background-color: #dc3545;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.reservation-card .cancel-btn:hover {
+  background-color: #c82333;
+}
+
+.reservation-card .cancel-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
+}
+
+/* No reservations message */
+.no-reservations {
+  text-align: center;
+  padding: 40px 20px;
+  color: #555;
+  font-size: 1.1em;
+  background-color: #fff;
+  border-radius: 5px;
+  margin: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .reservations-list {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+
+  .reservation-card {
+    margin: 10px;
+  }
+}
+
+/* Loading state */
+.reservation-card.loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.reservation-card.loading::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 </style>
 

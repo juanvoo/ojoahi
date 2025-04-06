@@ -111,18 +111,23 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
       console.log(`Buscando reservas para el usuario ciego con ID: ${userId}`);
       
       const Reservation = require('../models/Reservation');
+      const Review = require('../models/Review');
       const HelpRequest = require('../models/HelpRequest');
       
       const reservations = await Reservation.getByUserId(userId);
       const pendingRequests = await HelpRequest.getByUserId(userId);
+      const reviews = await Review.getByUserId(userId);
       
       console.log(`Reservas encontradas para usuario ciego: ${reservations.length}`);
       console.log(`Solicitudes pendientes encontradas: ${pendingRequests.length}`);
+      console.log(`Reseñas encontradas para usuario ciego: ${reviews.length}`);
+
       
       return res.render('dashboard/blind', {
         user: req.session.user,
         reservations,
         pendingRequests,
+        reviews,
         notifications,
         unreadMessages,
         title: 'Dashboard'

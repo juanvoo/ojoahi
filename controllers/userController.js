@@ -17,16 +17,19 @@ exports.getDashboard = async (req, res) => {
 
     if (userRole === 'blind') {
       // Dashboard para usuarios ciegos
-      const reservations = await Reservation.getByUserId(userId);
+      console.log(`Buscando reservas y reseñas para el usuario ciego con ID: ${userId}`);
+      const helpRequests = await HelpRequest.getByUserId(userId);
       const reviews = await Review.getByUserId(userId);
       
-      console.log(`Reservas encontradas para usuario ciego: ${reservations.length}`);
+      console.log(`Solicitudes/Reservas encontradas para usuario ciego: ${helpRequests.length}`);
       console.log(`Reseñas encontradas para usuario ciego: ${reviews.length}`);
       
       return res.render('dashboard/blind', {
         user: req.session.user,
-        reservations,
+        reservations: helpRequests,
         reviews,
+        notifications,
+        unreadMessages,
         title: 'Dashboard'
       });
     } else if (userRole === 'volunteer') {
