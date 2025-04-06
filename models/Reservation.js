@@ -14,6 +14,21 @@ class Reservation {
       throw error;
     }
   }
+  
+  static async find({ user_id, sort = {} }) {
+    try {
+      const query = 'SELECT r.*, v.name as volunteer_name FROM reservations r ' +
+                   'LEFT JOIN volunteers v ON r.volunteer_id = v.id ' +
+                   'WHERE r.user_id = $1 ' +
+                   'ORDER BY r.date DESC';
+      
+      const result = await db.query(query, [user_id]);
+      return result.rows;
+    } catch (error) {
+      console.error('Error al obtener reservas:', error);
+      throw error;
+    }
+  }
 
   static async findById(id) {
     const [rows] = await db.execute(
@@ -74,6 +89,17 @@ class Reservation {
       return result.affectedRows > 0;
     } catch (error) {
       console.error('Error al actualizar el estado de la reserva:', error);
+      throw error;
+    }
+  }
+
+  static async cancel(id) {
+    try {
+      const query = 'UPDATE reservations SET status = $1 WHERE id = $2 RETURNING *';
+      const result = await db.query(query, ['cancelled', id]);
+      return result.rows[0];
+    } catch (error) {
+      console.error('Error al cancelar reserva:', error);
       throw error;
     }
   }

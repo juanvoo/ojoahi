@@ -1,68 +1,4 @@
-{{!-- <link rel="stylesheet" href="/css/dashblind.css">
-<link rel="stylesheet" href="/css/delete.css">
-  <div class="blind">
-<h1 style="background-color: #0d0d0dff; color:#00f8b6ff">Bienvenido, {{user.username}}!</h1>
-<br>
-
-<div class="dashboard-options">
-  <h2 style="color: white;">{{__ 'MakeReservation'}}</h2>
-  <a href="/volunteerList" class="btn" style="color: white;">Ver lista de voluntarios y solicitar asistencia</a>
-<br>
-<br>
-<section>
-  <h2 style="color: white;">Crear una Nueva Reseña</h2>
-  <a href="/reviews/create" class="btn" style="border-radius: 5px; background-color:#00f8b6ff">Crear Nueva Reseña</a>
-</section>
-<br>
-<br>
-<section>
-  <h2 style="color: white;">{{__ 'YourReservations'}}</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>{{__ 'Date'}}</th>
-        <th>{{__ 'Time'}}</th>
-        <th>{{__ 'Volunteer'}}</th>
-        <th>{{__ 'Status'}}</th>
-        <th>{{__ 'Actions'}}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each reservations}}
-        <tr>
-          <td>{{formatDate this.date}}</td>
-          <td>{{this.time}}</td>
-          <td>{{this.volunteer_name}}</td>
-          <td>{{__ this.status}}</td>
-          <td>
-            {{#if (eq this.status 'pending')}}
-              <form action="/reservations/cancel/{{this.id}}" method="POST">
-                <button type="submit">{{__ 'Cancel'}}</button>
-              </form>
-            {{/if}}
-            {{#if (eq this.status 'completed')}}
-              <a href="/reviews/create/{{this.id}}">{{__ 'LeaveReview'}}</a>
-            {{/if}}
-          </td>
-        </tr>
-      {{/each}}
-    </tbody>
-  </table>
-</section>
-
-</div>
-<div class="delete-account-section">
-  <h2>Eliminar cuenta</h2>
-  <p>¡Atención! Esta acción es irreversible y eliminará permanentemente tu cuenta y todos tus datos asociados.</p>
-  <form action="/users/delete-account" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.');">
-    <button type="submit" class="btn btn-danger">Eliminar mi cuenta</button>
-  </form>
-</div>
-</div> --}}
-
-
-
-<h1>Bienvenido, {{user.username}}!</h1>
+{{!-- <h1>Bienvenido, {{user.username}}!</h1>
 
 {{#if notifications.length}}
   <div class="alert alert-info">
@@ -188,3 +124,821 @@
     <button type="submit" class="btn btn-danger">Eliminar mi cuenta</button>
   </form>
 </div>
+ --}}
+
+<div class="modern-dashboard">
+ 
+  <!-- Contenido principal -->
+  <main class="main-content" role="main">
+    <!-- Header con información del usuario -->
+    <div class="user-info-header">
+      <div class="user-profile-info">
+        <h2>{{user.username}}</h2>
+        <div class="user-status">
+          <span class="status-dot"></span>
+          <p class="status-text">Usuario · En línea</p>
+        </div>
+      </div>
+      <button 
+        class="btn-modern secondary notification-toggle"
+        onclick="toggleNotifications()"
+        aria-label="Ver notificaciones">
+        <i class="fas fa-bell" aria-hidden="true"></i>
+        {{#if notifications.length}}
+          <span class="notification-badge" aria-label="{{notifications.length}} notificaciones sin leer">
+            {{notifications.length}}
+          </span>
+        {{/if}}
+      </button>
+    </div>
+
+    <!-- Nueva sección de notificaciones -->
+    <div id="notifications-panel" class="notifications-panel" hidden>
+      <div class="notifications-header">
+        <h2>Notificaciones</h2>
+        {{#if notifications.length}}
+          <button 
+            class="btn-modern small"
+            onclick="markAllAsRead()"
+            aria-label="Marcar todas las notificaciones como leídas">
+            Marcar todas como leídas
+          </button>
+        {{/if}}
+      </div>
+
+      {{#if notifications.length}}
+        <div class="notifications-list">
+          {{#each notifications}}
+            <div class="notification-item {{#if this.unread}}unread{{/if}}" role="article">
+              <div class="notification-icon">
+                {{#if (eq this.type "assistance")}}
+                  <i class="fas fa-hands-helping" aria-hidden="true"></i>
+                {{else if (eq this.type "message")}}
+                  <i class="fas fa-envelope" aria-hidden="true"></i>
+                {{else if (eq this.type "review")}}
+                  <i class="fas fa-star" aria-hidden="true"></i>
+                {{else}}
+                  <i class="fas fa-bell" aria-hidden="true"></i>
+                {{/if}}
+              </div>
+              <div class="notification-content">
+                <h3>{{this.title}}</h3>
+                <p>{{this.message}}</p>
+                <small class="notification-time">{{formatDate this.created_at}}</small>
+              </div>
+              {{#if this.unread}}
+                <button 
+                  class="btn-modern small mark-read"
+                  onclick="markAsRead('{{this.id}}')"
+                  aria-label="Marcar esta notificación como leída">
+                  <i class="fas fa-check" aria-hidden="true"></i>
+                </button>
+              {{/if}}
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="empty-notifications">
+          <i class="fas fa-check-circle fa-2x" aria-hidden="true"></i>
+          <p>No tienes notificaciones nuevas</p>
+        </div>
+      {{/if}}
+    </div>
+
+    <!-- Grid de acciones principales -->
+    <section class="actions-grid" aria-label="Acciones principales">
+      <!-- Solicitar Ayuda -->
+      <div class="action-card primary">
+        <div class="action-content">
+          <i class="fas fa-hands-helping" aria-hidden="true"></i>
+          <h2>Solicitar Ayuda</h2>
+          <p>Obtén asistencia de nuestros voluntarios</p>
+          <button 
+            onclick="window.location.href='/help-requests/create'" 
+            class="btn-modern primary"
+            aria-label="Solicitar nueva ayuda">
+            Solicitar
+          </button>
+        </div>
+      </div>
+
+      <!-- Explorar Voluntarios -->
+      <div class="action-card secondary">
+        <div class="action-content">
+          <i class="fas fa-users" aria-hidden="true"></i>
+          <h2>Explorar Voluntarios</h2>
+          <p>Encuentra voluntarios disponibles</p>
+          <button 
+            onclick="window.location.href='/users/volunteers'" 
+            class="btn-modern secondary"
+            aria-label="Ver lista de voluntarios">
+            Explorar
+          </button>
+        </div>
+      </div>
+
+      <!-- Mis Conversaciones -->
+      <div class="action-card accent">
+        <div class="action-content">
+          <i class="fas fa-comments" aria-hidden="true"></i>
+          <h2>Mis Conversaciones</h2>
+          <p>Chatea con voluntarios</p>
+          <button 
+            onclick="window.location.href='/chat'" 
+            class="btn-modern accent"
+            aria-label="Ver mis conversaciones">
+            Ver Chat
+            {{#if unreadMessages}}
+              <span class="badge">{{unreadMessages}}</span>
+            {{/if}}
+          </button>
+        </div>
+      </div>
+
+      <!-- Dejar Reseña -->
+      <div class="action-card success">
+        <div class="action-content">
+          <i class="fas fa-star" aria-hidden="true"></i>
+          <h2>Dejar Reseña</h2>
+          <p>Califica la ayuda recibida</p>
+          <button 
+            onclick="window.location.href='/reviews/create'" 
+            class="btn-modern success"
+            aria-label="Crear nueva reseña">
+            Crear Reseña
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección de Mis Reservas -->
+    <section class="reservations-section" aria-labelledby="reservations-title">
+      <h2 id="reservations-title">Mis Reservas</h2>
+      {{#if reservations.length}}
+        <div class="table-responsive">
+          <table class="modern-table" role="grid">
+            <thead>
+              <tr>
+                <th scope="col">Fecha</th>
+                <th scope="col">Hora</th>
+                <th scope="col">Voluntario</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each reservations}}
+                <tr>
+                  <td>{{formatDate this.date}}</td>
+                  <td>{{this.time}}</td>
+                  <td>{{this.volunteer_name}}</td>
+                  <td>
+                    <span class="status-badge {{this.status}}">{{this.status}}</span>
+                  </td>
+                  <td>
+                    <div class="table-actions">
+                      {{#if (eq this.status "completed")}}
+                        <button 
+                          onclick="window.location.href='/reviews/create/{{this.id}}'"
+                          class="btn-modern small success"
+                          aria-label="Dejar reseña para {{this.volunteer_name}}">
+                          Dejar Reseña
+                        </button>
+                      {{/if}}
+                      {{#if (eq this.status "pending")}}
+                        <button 
+                          onclick="cancelReservation('{{this.id}}')"
+                          class="btn-modern small danger"
+                          aria-label="Cancelar reserva con {{this.volunteer_name}}">
+                          Cancelar
+                        </button>
+                      {{/if}}
+                    </div>
+                  </td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      {{else}}
+        <p class="no-data">No tienes reservas activas</p>
+      {{/if}}
+    </section>
+
+    <!-- Sección de Mis Reseñas -->
+    <section class="reviews-section" aria-labelledby="reviews-title">
+      <h2 id="reviews-title">Mis Reseñas</h2>
+      {{#if reviews.length}}
+        <div class="reviews-grid">
+          {{#each reviews}}
+            <div class="review-card">
+              <div class="review-header">
+                <h3>{{this.volunteer_name}}</h3>
+                <div class="rating">
+                  {{#times this.rating}}⭐{{/times}}
+                </div>
+              </div>
+              <p class="review-comment">{{this.comment}}</p>
+              <small class="review-date">{{formatDate this.created_at}}</small>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <p class="no-data">Aún no has dejado reseñas</p>
+      {{/if}}
+    </section>
+  </main>
+</div>
+
+<style>
+:root {
+  --primary-color: #2563eb;
+  --secondary-color: #4b5563;
+  --accent-color: #8b5cf6;
+  --success-color: #10b981;
+  --danger-color: #ef4444;
+  --background-color: #f3f4f6;
+  --card-background: #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --border-radius: 12px;
+  --transition: all 0.3s ease;
+}
+
+.modern-dashboard {
+  background: var(--background-color);
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+/* Estilos para el nuevo header de usuario */
+.user-info-header {
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.user-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.user-profile-info h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+.user-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #10b981;
+  border-radius: 50%;
+}
+
+.status-text {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Ajustar el main-content ya que no hay sidebar */
+.main-content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+/* Barra lateral */
+.side-nav {
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  position: sticky;
+  top: 1rem;
+  height: calc(100vh - 2rem);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: var(--transition);
+  gap: 0.5rem;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* Grid de acciones */
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.action-card {
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: var(--transition);
+}
+
+.action-card:hover {
+  transform: translateY(-5px);
+}
+
+.action-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+}
+
+.action-content i {
+  font-size: 2rem;
+  color: var(--primary-color);
+}
+
+/* Tablas modernas */
+.modern-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.modern-table th,
+.modern-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modern-table th {
+  background: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  text-align: left;
+}
+
+/* Reseñas */
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.review-card {
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Botones */
+.btn-modern {
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-modern.primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-modern.secondary {
+  background: var(--secondary-color);
+  color: white;
+}
+
+.btn-modern.success {
+  background: var(--success-color);
+  color: white;
+}
+
+.btn-modern.danger {
+  background: var(--danger-color);
+  color: white;
+}
+
+.btn-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Notificaciones */
+.notification-toggle {
+  position: relative;
+  padding: 0.5rem;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--danger-color);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notifications-panel {
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.notifications-list {
+  padding: 1rem;
+}
+
+.notification-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  background: white;
+  margin-bottom: 0.5rem;
+  transition: var(--transition);
+}
+
+.notification-item.unread {
+  background: #f0f9ff;
+  border-left: 4px solid var(--primary-color);
+}
+
+.notification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--background-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-icon i {
+  color: var(--primary-color);
+}
+
+.notification-content {
+  flex-grow: 1;
+}
+
+.notification-content h3 {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.notification-content p {
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.notification-time {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.mark-read {
+  align-self: center;
+  padding: 0.5rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.empty-notifications {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+  text-align: center;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .notifications-panel {
+    position: fixed;
+    top: 60px;
+    left: 1rem;
+    right: 1rem;
+    z-index: 1000;
+    max-height: calc(100vh - 120px);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modern-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .side-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: auto;
+    z-index: 1000;
+  }
+
+  .nav-menu {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .nav-item span {
+    display: none;
+  }
+
+  .nav-item i {
+    font-size: 1.5rem;
+  }
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+*:focus {
+  outline: 3px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  color: var(--text-secondary);
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .modern-dashboard {
+    padding: 1rem;
+  }
+
+  .user-info-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .actions-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .reviews-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-responsive {
+    margin: 0 -1rem;
+    padding: 0 1rem;
+    overflow-x: auto;
+  }
+
+  .modern-table {
+    min-width: 600px;
+  }
+
+  .notifications-panel {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 80vh;
+    margin: 0;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    z-index: 1000;
+  }
+}
+
+@media (max-width: 480px) {
+  .action-card {
+    padding: 1rem;
+  }
+
+  .btn-modern {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .table-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .notification-item {
+    padding: 0.75rem;
+  }
+
+  .user-profile-info h2 {
+    font-size: 1.25rem;
+  }
+
+  .notification-toggle {
+    position: relative;
+    margin-top: 1rem; /* Espacio desde el nombre de usuario */
+    padding: 0.5rem;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+  }
+
+  .user-info-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1rem;
+  }
+}
+}
+</style>
+
+<script>
+// Función para cancelar reserva
+function cancelReservation(requestId) {
+  if (confirm('¿Estás seguro de que deseas cancelar esta solicitud de ayuda?')) {
+    fetch(`/help-requests/${requestId}/cancel`, { 
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      if (response.ok) {
+        window.location.reload();
+      }
+    });
+  }
+}
+
+// Atajos de teclado
+document.addEventListener('keydown', function(e) {
+  if (e.altKey) {
+    switch(e.key) {
+      case 'h':
+        window.location.href = '/help-requests/new';
+        break;
+      case 'v':
+        window.location.href = '/volunteers';
+        break;
+      case 'c':
+        window.location.href = '/chat';
+        break;
+      case 'r':
+        window.location.href = '/reviews/create';
+        break;
+    }
+  }
+});
+
+// Función para mostrar/ocultar panel de notificaciones
+function toggleNotifications() {
+  const panel = document.getElementById('notifications-panel');
+  panel.hidden = !panel.hidden;
+}
+
+// Función para marcar una notificación como leída
+function markAsRead(notificationId) {
+  fetch(`/notifications/${notificationId}/read`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).then(response => {
+    if (response.ok) {
+      window.location.reload();
+    }
+  });
+}
+
+// Función para marcar todas las notificaciones como leídas
+function markAllAsRead() {
+  fetch('/notifications/mark-all-read', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).then(response => {
+    if (response.ok) {
+      window.location.reload();
+    }
+  });
+}
+
+// Cerrar panel de notificaciones al hacer clic fuera
+document.addEventListener('click', function(event) {
+  const panel = document.getElementById('notifications-panel');
+  const toggle = document.querySelector('.notification-toggle');
+  
+  if (!panel.hidden && 
+      !panel.contains(event.target) && 
+      !toggle.contains(event.target)) {
+    panel.hidden = true;
+  }
+});
+
+// Atajo de teclado para notificaciones (Alt + N)
+document.addEventListener('keydown', function(e) {
+  if (e.altKey && e.key === 'n') {
+    toggleNotifications();
+  }
+});
+</script>
