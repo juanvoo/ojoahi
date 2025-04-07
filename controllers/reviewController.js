@@ -7,30 +7,35 @@ exports.getCreateReview = async (req, res) => {
     const reservationId = req.params.reservationId;
     let volunteer = null;
     
+    const ratingLabels = [
+      { value: 5, label: 'Excelente' },
+      { value: 4, label: 'Muy bueno' },
+      { value: 3, label: 'Bueno' },
+      { value: 2, label: 'Regular' },
+      { value: 1, label: 'Necesita mejorar' }
+    ];
+
     if (reservationId) {
-      // Si viene de una reserva específica, obtener los datos de la reserva
       const reservation = await Review.getReservationById(reservationId);
       if (!reservation) {
         req.flash('error_msg', 'Reserva no encontrada');
         return res.redirect('/users/dashboard');
       }
-      
-      // Obtener los datos del voluntario
       volunteer = await User.findById(reservation.volunteer_id);
     } else {
-      // Si no viene de una reserva, obtener la lista de voluntarios
       const volunteers = await User.getVolunteers();
-      
       return res.render('reviews/create', {
         title: 'Dejar Reseña',
-        volunteers
+        volunteers,
+        ratingLabels
       });
     }
     
     res.render('reviews/create', {
       title: 'Dejar Reseña',
       reservationId,
-      volunteer
+      volunteer,
+      ratingLabels
     });
   } catch (error) {
     console.error('Error al cargar el formulario de reseña:', error);
@@ -51,14 +56,8 @@ exports.postCreateReview = async (req, res) => {
       return res.redirect(reservationId ? `/reviews/create/${reservationId}` : '/reviews/create');
     }
     
-    // Crear la reseña
-    await Review.create({
-      reservation_id: reservationId,
-      user_id,
-      volunteer_id,
-      rating,
-      comment
-    });
+    // Crear la reseña - pasando los parámetros individualmente
+    await Review.create(user_id, volunteer_id, reservationId, rating, comment);
     
     // Crear notificación para el voluntario
     await Notification.create({

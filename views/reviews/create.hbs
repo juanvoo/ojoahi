@@ -1,4 +1,4 @@
-<div class="create" style="background-color: #0d0d0dff;">
+{{!-- <div class="create" style="background-color: #0d0d0dff;">
 <h1 style="color: #00f8b6ff;">Crear Reseña</h1>
 
 <form style="color: white;" action="{{#if reservationId}}/reviews/create/{{reservationId}}{{else}}/reviews/create{{/if}}" method="POST">
@@ -38,91 +38,266 @@
 
   <button class="mt-3 btn mb-3" type="submit" style="border-radius: 5px; color:#0d0d0dff; background-color:#00f8b6ff">Enviar Reseña</button>
 </form>
-</div>
+</div> --}}
 
 
 
-
-
-
-<h1>Dejar Reseña</h1>
-
-<div class="card mb-4">
-  <div class="card-body">
-    <form action="{{#if reservationId}}/reviews/create/{{reservationId}}{{else}}/reviews/create{{/if}}" method="POST">
-      {{#if volunteer}}
-        <div class="form-group mb-3">
-          <label for="volunteer_id">Voluntario:</label>
-          <input type="text" class="form-control" value="{{volunteer.username}}" readonly>
-          <input type="hidden" name="volunteer_id" value="{{volunteer.id}}">
+{{!-- <div class="create-review-form" role="main">
+    <h1>Crear Nueva Reseña</h1>
+    
+    <form action="/reviews/create" method="POST" aria-label="Formulario de reseña">
+        <div class="form-group">
+            <label for="volunteer_select">Seleccionar Voluntario:</label>
+            <select id="volunteer_select" name="volunteer_id" required aria-required="true">
+                <option value="">Seleccione un voluntario</option>
+                {{#each volunteers}}
+                    <option value="{{id}}">{{username}}</option>
+                {{/each}}
+            </select>
         </div>
-      {{else}}
-        <div class="form-group mb-3">
-          <label for="volunteer_id">Seleccionar Voluntario:</label>
-          <select name="volunteer_id" id="volunteer_id" class="form-control" required>
-            <option value="">Seleccione un voluntario</option>
-            {{#each volunteers}}
-              <option value="{{this.id}}">{{this.username}}</option>
-            {{/each}}
-          </select>
-        </div>
-      {{/if}}
 
-      <div class="form-group mb-3">
-        <label>Calificación:</label>
-        <div class="rating">
-          <div class="stars">
-            <input type="radio" name="rating" id="star5" value="5" required>
-            <label for="star5">★</label>
-            <input type="radio" name="rating" id="star4" value="4">
-            <label for="star4">★</label>
-            <input type="radio" name="rating" id="star3" value="3">
-            <label for="star3">★</label>
-            <input type="radio" name="rating" id="star2" value="2">
-            <label for="star2">★</label>
-            <input type="radio" name="rating" id="star1" value="1">
-            <label for="star1">★</label>
+        <div class="form-group">
+            <label for="rating">Calificación:</label>
+            <div class="rating-input" role="radiogroup" aria-label="Seleccionar calificación">
+                {{#each (range 1 5)}}
+                    <input type="radio" id="star{{this}}" name="rating" value="{{this}}" required
+                           aria-label="{{this}} estrellas">
+                    <label for="star{{this}}" aria-hidden="true">★</label>
+                {{/each}}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="comment">Comentario:</label>
+            <textarea id="comment" name="comment" required aria-required="true"
+                      rows="4" placeholder="Describe tu experiencia con el voluntario"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enviar Reseña</button>
+    </form>
+</div> --}}
+
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h1 class="h3 mb-0">Dejar Reseña</h1>
+    </div>
+    
+    <div class="card-body">
+      <form action="{{#if reservationId}}/reviews/create/{{reservationId}}{{else}}/reviews/create{{/if}}" 
+            method="POST" 
+            class="needs-validation" 
+            novalidate>
+        
+        {{#if volunteer}}
+          <div class="form-group mb-4">
+            <label for="volunteer_id" class="form-label">Voluntario:</label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-user-circle"></i>
+              </span>
+              <input type="text" 
+                     class="form-control" 
+                     value="{{volunteer.username}}" 
+                     readonly 
+                     aria-label="Nombre del voluntario">
+              <input type="hidden" name="volunteer_id" value="{{volunteer.id}}">
+            </div>
+          </div>
+        {{else}}
+          <div class="form-group mb-4">
+            <label for="volunteer_id" class="form-label">Seleccionar Voluntario:</label>
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-users"></i>
+              </span>
+              <select name="volunteer_id" 
+                      id="volunteer_id" 
+                      class="form-select" 
+                      required 
+                      aria-label="Selección de voluntario">
+                <option value="">Seleccione un voluntario</option>
+                {{#each volunteers}}
+                  <option value="{{this.id}}">{{this.username}}</option>
+                {{/each}}
+              </select>
+              <div class="invalid-feedback">
+                Por favor seleccione un voluntario
+              </div>
+            </div>
+          </div>
+        {{/if}}
+
+        <div class="form-group mb-4">
+          <label class="form-label">Calificación:</label>
+          <div class="rating-container">
+            <div class="stars">
+              <input type="radio" name="rating" id="star5" value="5" required>
+              <label for="star5" class="star-label" title="Excelente">★</label>
+              
+              <input type="radio" name="rating" id="star4" value="4">
+              <label for="star4" class="star-label" title="Muy bueno">★</label>
+              
+              <input type="radio" name="rating" id="star3" value="3">
+              <label for="star3" class="star-label" title="Bueno">★</label>
+              
+              <input type="radio" name="rating" id="star2" value="2">
+              <label for="star2" class="star-label" title="Regular">★</label>
+              
+              <input type="radio" name="rating" id="star1" value="1">
+              <label for="star1" class="star-label" title="Necesita mejorar">★</label>
+            </div>
+            <div class="rating-text mt-2">
+              <small class="text-muted" id="rating-description">Seleccione una calificación</small>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="form-group mb-3">
-        <label for="comment">Comentario:</label>
-        <textarea name="comment" id="comment" class="form-control" rows="4" required></textarea>
-      </div>
+        <div class="form-group mb-4">
+          <label for="comment" class="form-label">Comentario:</label>
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="fas fa-comment"></i>
+            </span>
+            <textarea name="comment" 
+                      id="comment" 
+                      class="form-control" 
+                      rows="4" 
+                      required 
+                      placeholder="Describe tu experiencia con el voluntario..."
+                      aria-label="Comentario de la reseña"></textarea>
+            <div class="invalid-feedback">
+              Por favor ingrese un comentario
+            </div>
+          </div>
+          <small class="text-muted">
+            Mínimo 10 caracteres
+          </small>
+        </div>
 
-      <button type="submit" class="btn btn-primary">Enviar Reseña</button>
-      <a href="/users/dashboard" class="btn btn-secondary">Cancelar</a>
-    </form>
+        <div class="d-flex gap-2">
+          <button type="submit" 
+                  class="btn btn-primary" 
+                  id="submitReview">
+            <i class="fas fa-paper-plane me-2"></i>
+            Enviar Reseña
+          </button>
+          <a href="/users/dashboard" 
+             class="btn btn-outline-secondary">
+            <i class="fas fa-times me-2"></i>
+            Cancelar
+          </a>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
 <style>
-  .rating {
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
+.rating-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px 0;
+}
+
+.stars {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  gap: 0.25rem;
+}
+
+.stars input[type="radio"] {
+  display: none;
+}
+
+.star-label {
+  color: #ddd;
+  font-size: 2.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-block;
+  padding: 0 5px;
+}
+
+.star-label:hover,
+.star-label:hover ~ .star-label,
+.stars input[type="radio"]:checked ~ .star-label {
+  color: #ffc107;
+  transform: scale(1.1);
+}
+
+.stars input[type="radio"]:checked + .star-label {
+  animation: pulse 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* Mejoras de accesibilidad para modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .star-label {
+    color: #555;
   }
   
-  .stars {
-    display: inline-block;
-    direction: rtl;
+  .star-label:hover,
+  .star-label:hover ~ .star-label,
+  .stars input[type="radio"]:checked ~ .star-label {
+    color: #ffd700;
   }
-  
-  .stars input[type="radio"] {
-    display: none;
-  }
-  
-  .stars label {
-    color: #ddd;
-    font-size: 2rem;
-    padding: 0 0.1rem;
-    cursor: pointer;
-  }
-  
-  .stars label:hover,
-  .stars label:hover ~ label,
-  .stars input[type="radio"]:checked ~ label {
-    color: #ffc107;
-  }
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('.needs-validation');
+  const ratingInputs = document.querySelectorAll('input[name="rating"]');
+  const ratingDescription = document.getElementById('rating-description');
+  const commentTextarea = document.querySelector('#comment');
+  
+  const ratingLabels = {
+    5: 'Excelente',
+    4: 'Muy bueno',
+    3: 'Bueno',
+    2: 'Regular',
+    1: 'Necesita mejorar'
+  };
+
+  // Actualizar texto de calificación
+  ratingInputs.forEach(input => {
+    input.addEventListener('change', function() {
+      const rating = this.value;
+      ratingDescription.textContent = `${rating} estrellas - ${ratingLabels[rating]}`;
+    });
+  });
+
+  // Validación personalizada
+  form.addEventListener('submit', function(event) {
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    if (commentTextarea.value.length < 10) {
+      event.preventDefault();
+      commentTextarea.setCustomValidity('El comentario debe tener al menos 10 caracteres');
+    } else {
+      commentTextarea.setCustomValidity('');
+    }
+
+    form.classList.add('was-validated');
+  });
+
+  // Limpiar validación al escribir
+  commentTextarea.addEventListener('input', function() {
+    if (this.value.length >= 10) {
+      this.setCustomValidity('');
+    } else {
+      this.setCustomValidity('El comentario debe tener al menos 10 caracteres');
+    }
+  });
+});
+</script>

@@ -93,6 +93,15 @@ app.engine('hbs', engine({
       
       // Formatear con el número de decimales especificado
       return num.toFixed(decimals);
+    },
+    range: function(from, to, increment = 1) {
+      const array = [];
+      from = parseInt(from);
+      to = parseInt(to);
+      for (let i = from; i <= to; i += increment) {
+        array.push(i);
+      }
+      return array;
     }
   }
 }));
